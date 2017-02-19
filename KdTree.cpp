@@ -1,7 +1,7 @@
 #include "KdNode.h"
 #include "KdTree.h"
 
-#include <iostream>
+//#include <iostream>
 
 void KdTree::input(const char * filename)
 {
