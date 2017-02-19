@@ -1,6 +1,7 @@
 #include "KdTree.h"
 #include "Map.h"
 #include "RrTree.h"
+#include "Render.h"
 
 #include <iostream>
 #include <cmath>
@@ -31,6 +32,16 @@ int main(int argc, char ** argv) {
     my_rrt.get_path(my_rrt.nodes.size() - 1);
     std::cout << "rrt points : "<< my_rrt.nodes.size() << '\n';
     std::cout << "path points : "<< my_rrt.path.size() << '\n';
+
+    Bitmap my_bmp(width, height);
+    render_map(my_map, &my_bmp);
+    for (size_t i = 0; i < my_rrt.nodes.size(); i++) {
+        my_rrt.go(i);
+        if (my_rrt.edges.size())
+            render_path(my_rrt.edges, &my_bmp, 0);
+    }
+    render_path(my_rrt.path, &my_bmp, 1);
+    my_bmp.out_bmp("MAP_PATH.bmp");
 
     /*bitmap_t my_bmp(width, height);
     render_map(my_map, &my_bmp);

@@ -1,8 +1,24 @@
 #include "Bitmap.h"
 
+#ifndef DWORD
+#define WINAPI
+typedef unsigned long DWORD;
+typedef short WCHAR;
+typedef void * HANDLE;
+#define MAX_PATH PATH_MAX
+typedef unsigned char BYTE;
+typedef unsigned short WORD;
+typedef long int LONG;
+typedef unsigned int BOOL;
+#endif
+
+# define BI_RGB 0
+
 //#include <windows.h>
 #include <iostream>
 #include <cstring>
+#include <fstream>
+
 
 Bitmap::Bitmap(int w, int h)
 {
@@ -14,21 +30,56 @@ Bitmap::Bitmap(int w, int h)
     }*/
 }
 
-void Bitmap::add_pix(int i, int j, bool color, bool edge_path)
-{
-    size_t index = (j*width + i)*3;
+void Bitmap::add_pix(int i, int j, bool color, bool edge_path) {
+    size_t index = (j * width + i) * 3;
     if (edge_path) {
-        data[index] = (unsigned char)(0);
-        data[index + 1] = (unsigned char)(0);
-        data[index + 2] = (unsigned char)(255);
+        data[index] = (unsigned char) (0);
+        data[index + 1] = (unsigned char) (0);
+        data[index + 2] = (unsigned char) (255);
     } else {
         for (size_t k = 0; k < 3; k++) {
-            data[index + k] = (unsigned char)((color) ? 0 : 255);
+            data[index + k] = (unsigned char) ((color) ? 0 : 255);
         }
     }
 }
-/*
 
+
+
+
+typedef struct tagBITMAPFILEHEADER {
+    WORD  bfType;
+    DWORD bfSize;
+    WORD  bfReserved1;
+    WORD  bfReserved2;
+    DWORD bfOffBits;
+} BITMAPFILEHEADER;
+
+typedef struct tagBITMAPINFOHEADER {
+    DWORD biSize;
+    LONG  biWidth;
+    LONG  biHeight;
+    WORD  biPlanes;
+    WORD  biBitCount;
+    DWORD biCompression;
+    DWORD biSizeImage;
+    LONG  biXPelsPerMeter;
+    LONG  biYPelsPerMeter;
+    DWORD biClrUsed;
+    DWORD biClrImportant;
+} BITMAPINFOHEADER;
+/*
+std::ofstream operator<<(std::ofstream &is, BITMAPFILEHEADER & it) {
+    is << it.bfType << it.bfSize << it.bfReserved1 << it.bfReserved2 << it.bfOffBits;
+    return is;
+}
+
+std::ofstream operator<<(std::ofstream &is, BITMAPINFOHEADER & it) {
+    is << it.biSize << it.biWidth << it.biHeight << it.biPlanes << it.biBitCount
+       << it.biCompression << it.biSizeImage << it.biXPelsPerMeter << it.biYPelsPerMeter
+       << it.biClrUsed << it.biClrImportant;
+    return is;
+}
+*/
 void Bitmap::out_bmp(const char * fname)
 {
     HANDLE hFile;
@@ -55,15 +106,26 @@ void Bitmap::out_bmp(const char * fname)
     bih.biWidth = width;
     bih.biPlanes = 1;
 
-    hFile = CreateFile (fname, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+    //hFile = CreateFile (fname, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+    std::ofstream file(fname);
+    file << bfh.bfType << bfh.bfSize << bfh.bfReserved1 << bfh.bfReserved2 << bfh.bfOffBits;
 
-    WriteFile (hFile, &bfh, sizeof(bfh), &RW, NULL);
-    WriteFile (hFile, &bih, sizeof(bih), &RW, NULL);
-    WriteFile (hFile, Palette, 1024, &RW, NULL);
+    file << bih.biSize << bih.biWidth << bih.biHeight << bih.biPlanes << bih.biBitCount
+         << bih.biCompression << bih.biSizeImage << bih.biXPelsPerMeter << bih.biYPelsPerMeter
+         << bih.biClrUsed << bih.biClrImportant;
+    for (int i = 0; i < 1024; i++) {
+        file << Palette[i];
+    }
+
+
+    //WriteFile (hFile, &bfh, sizeof(bfh), &RW, NULL);
+    //WriteFile (hFile, &bih, sizeof(bih), &RW, NULL);
+    //WriteFile (hFile, Palette, 1024, &RW, NULL);
 
     for (size_t i = 0; i < height * width * 3; i++) {
-        WriteFile (hFile, &data[i], sizeof(char), &RW, NULL);
+        //WriteFile (hFile, &data[i], sizeof(char), &RW, NULL);
+        file << &data[i];
     }
-    CloseHandle(hFile);
+    //CloseHandle(hFile);
 }
-*/
+
