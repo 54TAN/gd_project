@@ -2,7 +2,7 @@
 
 #ifndef DWORD
 #define WINAPI
-typedef unsigned long DWORD;
+typedef unsigned int DWORD; // was unsigned long
 typedef short WCHAR;
 typedef void * HANDLE;
 #define MAX_PATH PATH_MAX
@@ -49,8 +49,8 @@ void Bitmap::add_pix(int i, int j, bool color, bool edge_path) {
 typedef struct tagBITMAPFILEHEADER {
     WORD  bfType;
     DWORD bfSize;
-    WORD  bfReserved1;
-    WORD  bfReserved2;
+    WORD  bfReserved1; //
+    WORD  bfReserved2; //
     DWORD bfOffBits;
 } BITMAPFILEHEADER;
 
@@ -61,11 +61,11 @@ typedef struct tagBITMAPINFOHEADER {
     WORD  biPlanes;
     WORD  biBitCount;
     DWORD biCompression;
-    DWORD biSizeImage;
-    LONG  biXPelsPerMeter;
-    LONG  biYPelsPerMeter;
+    DWORD biSizeImage = 0;//
+    LONG  biXPelsPerMeter = 0; //
+    LONG  biYPelsPerMeter = 0; //
     DWORD biClrUsed;
-    DWORD biClrImportant;
+    DWORD biClrImportant = 0; //
 } BITMAPINFOHEADER;
 /*
 std::ofstream operator<<(std::ofstream &is, BITMAPFILEHEADER & it) {
@@ -110,10 +110,10 @@ void Bitmap::out_bmp(const char * fname)
     std::ofstream file(fname);
     file << bfh.bfType << bfh.bfSize << bfh.bfReserved1 << bfh.bfReserved2 << bfh.bfOffBits;
 
-    file << bih.biSize << bih.biWidth << bih.biHeight << bih.biPlanes << bih.biBitCount
+    /*file << bih.biSize << bih.biWidth << bih.biHeight << bih.biPlanes << bih.biBitCount
          << bih.biCompression << bih.biSizeImage << bih.biXPelsPerMeter << bih.biYPelsPerMeter
          << bih.biClrUsed << bih.biClrImportant;
-    for (int i = 0; i < 1024; i++) {
+    *//*for (int i = 0; i < 1024; i++) {
         file << Palette[i];
     }
 
@@ -125,7 +125,7 @@ void Bitmap::out_bmp(const char * fname)
     for (size_t i = 0; i < height * width * 3; i++) {
         //WriteFile (hFile, &data[i], sizeof(char), &RW, NULL);
         file << &data[i];
-    }
+    }*/
     //CloseHandle(hFile);
 }
 
