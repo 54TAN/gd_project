@@ -17,9 +17,6 @@ Bitmap::Bitmap(int w, int h) {
     width = w;
     height = h;
     data = new unsigned char [width*height*3];
-    /*for (size_t i = 0; i < width*height*3; i++) {
-        data[i] = (char)255;
-    }*/
 }
 
 void Bitmap::add_pix(int i, int j, bool color, bool edge_path) {
@@ -60,6 +57,7 @@ typedef struct tagBITMAPINFOHEADER {
     DWORD biClrImportant; //
 } BITMAPINFOHEADER;
 #pragma pack(pop)
+
 void Bitmap::out_bmp(const char * fname) {
 
     BITMAPFILEHEADER bfh;

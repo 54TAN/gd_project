@@ -23,15 +23,25 @@ int main(int argc, char ** argv) {
     my_map.obstacles.push_back(Obstacle(GeomVector(560, 330), GeomVector(570, 500)));
     my_map.obstacles.push_back(Obstacle(GeomVector(490, 250), GeomVector(700, 260)));
     my_map.obstacles.push_back(Obstacle(GeomVector(620, 430), GeomVector(700, 440)));
-    my_map.obstacles.push_back(Obstacle(GeomVector(660, 460), GeomVector(670, 500))); //финальная висяка*/
+    my_map.obstacles.push_back(Obstacle(GeomVector(660, 460), GeomVector(670, 500))); //финальная висяка*//*
     my_map.points.push_back(GeomVector(2, 2));
     my_map.points.push_back(GeomVector(698, 498));
 
-    RrTree my_rrt(&my_map, 50, 1); // все финальные тесты на 50
-    std::cout << "points map: " << my_map.points.size() << '\n';
+    clock_t t = clock();
+
+    RrTree my_rrt(&my_map, 10, 1); // все финальные тесты на 50
     my_rrt.get_path(my_rrt.nodes.size() - 1);
-    std::cout << "rrt points : "<< my_rrt.nodes.size() << '\n';
-    std::cout << "path points : "<< my_rrt.path.size() << '\n';
+
+    t = (clock() - t) / CLOCKS_PER_SEC;
+
+    int hours = t / 3600;
+    int minutes = (t - hours*3600) / 60;
+    int seconds = t - hours*3600 - minutes*60;
+
+    std::cout << "points map : " << my_map.points.size() << '\n';
+    std::cout << "rrt points : " << my_rrt.nodes.size() << '\n';
+    std::cout << "path points : " << my_rrt.path.size() << '\n';
+    std::cout << "time : " << hours << ":" << minutes << ":" << seconds << std::endl;
 
     Bitmap my_bmp(width, height);
     render_map(my_map, &my_bmp);
