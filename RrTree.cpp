@@ -8,24 +8,19 @@ RrTree::RrTree(Map* the_map, double distance, bool search) :
         min_distance(distance)
 {
     nodes.push_back(RrtNode(the_map->points.front())); // начальная точка
-
     double temp[2] = {the_map->points.front().x, the_map->points.front().y};
     KdTree kd;
     kd.nodes.push_back(KdNode(temp, 0));
-    //std::cout << kd.nodes[0].value[0] << " " << kd.nodes[0].value[1] << '\n';
-    //while (the_map->points.size() != 200000) {
     while (!is_available(the_map, nodes.back().point, goal_state.point)) {
         the_map->generate_points(1, the_map->width, the_map->height);
         this->extend(the_map, &kd, search);
     }
-    //this->nodes.push_back(goal_state);
-    //std::cout << "kd : " << kd.nodes.size() << '\n';
-    //std::cout << "rrt : " << this->nodes.size() << '\n';
 }
 
 void RrTree::extend(Map* the_map, KdTree * kd, bool search)
 {
     static int counter = 0;
+    static int current = 0;
 
     Point new_point = the_map->points.back();
     double temp[2] = {new_point.x, new_point.y};
@@ -42,17 +37,7 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search)
             }
         }
     }
-    //kd->seek_nearest_with_kd(0, temp, 0, best_index, best_distance);
-    //kd->seek_nearest_linear(temp, best_index, best_distance);
-/*
-    for (size_t i = 0; i < nodes.size(); i++) {
-        double tmp = get_distance(new_point, nodes[i].point);
-        if (tmp < best_distance) {
-            best_index = i;
-            best_distance = tmp;
-        }
-    }
-*/
+
     if ((this->is_available(the_map, new_point, nodes[best_index].point))  &&
         sqrt(best_distance) <= this->min_distance) {
         nodes.push_back(RrtNode(new_point, best_index));
@@ -60,10 +45,12 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search)
         nodes[best_index].children.push_back(nodes.size() - 1);
 
         counter++;
-        if (counter % 100)
-            std::cout << this->nodes.back().point.x << " "
-                      << this->nodes.back().point.y << std::endl;
-        //std::cout << "/* message */" << '\n';
+        if (counter % 50) {
+            if (this->nodes.back().point.x > current) {
+                current = this->nodes.back().point.x;
+                std::cout << current << std::endl;
+            }
+        }
     } else {
         the_map->points.pop_back();
         return;
@@ -142,8 +129,4 @@ void RrTree::go(int index)
             this->edges.push_back(nodes[nodes[index].children[i]].point);
         }
     }
-    //edges.push_back(Point(-1, -1));
-
-
-    //this->egdes.push_back(goal_state.point);
 }
