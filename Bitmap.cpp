@@ -4,7 +4,7 @@ typedef unsigned DWORD; // was unsigned long
 typedef void * HANDLE;
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
-typedef int LONG;
+typedef int LONG; // was long, which means sizeof(2*int) on my computer
 
 #define BI_RGB 0
 
