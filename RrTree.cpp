@@ -7,7 +7,7 @@ RrTree::RrTree(Map* the_map, double distance, bool search) :
         goal_state(RrtNode(the_map->points.back())),
         min_distance(distance)
 {
-    nodes.push_back(RrtNode(the_map->points.front())); // начальная точка
+    nodes.push_back(RrtNode(the_map->points.front()));
     double temp[2] = {the_map->points.front().x, the_map->points.front().y};
     KdTree kd;
     kd.nodes.push_back(KdNode(temp, 0));
