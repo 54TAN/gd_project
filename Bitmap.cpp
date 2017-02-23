@@ -1,6 +1,5 @@
 #include "Bitmap.h"
 
-
 typedef unsigned DWORD; // was unsigned long
 typedef void * HANDLE;
 typedef unsigned char BYTE;
@@ -9,11 +8,9 @@ typedef int LONG;
 
 #define BI_RGB 0
 
-//#include <windows.h>
 #include <iostream>
 #include <cstring>
 #include <fstream>
-
 
 Bitmap::Bitmap(int w, int h) {
     width = w;
@@ -58,22 +55,8 @@ typedef struct tagBITMAPINFOHEADER {
     DWORD biClrUsed;
     DWORD biClrImportant; //
 } BITMAPINFOHEADER;
-/*
-std::ofstream operator<<(std::ofstream &is, BITMAPFILEHEADER & it) {
-    is << it.bfType << it.bfSize << it.bfReserved1 << it.bfReserved2 << it.bfOffBits;
-    return is;
-}
 
-std::ofstream operator<<(std::ofstream &is, BITMAPINFOHEADER & it) {
-    is << it.biSize << it.biWidth << it.biHeight << it.biPlanes << it.biBitCount
-       << it.biCompression << it.biSizeImage << it.biXPelsPerMeter << it.biYPelsPerMeter
-       << it.biClrUsed << it.biClrImportant;
-    return is;
-}
-*/
 void Bitmap::out_bmp(const char * fname) {
-    HANDLE hFile;
-    DWORD RW;
 
     BITMAPFILEHEADER bfh;
     BITMAPINFOHEADER bih;
@@ -103,6 +86,7 @@ void Bitmap::out_bmp(const char * fname) {
     file << bih.biSize << bih.biWidth << bih.biHeight << bih.biPlanes << bih.biBitCount
          << bih.biCompression << bih.biSizeImage << bih.biXPelsPerMeter << bih.biYPelsPerMeter
          << bih.biClrUsed << bih.biClrImportant;
+/*
     for (int i = 0; i < 1024; i++) {
         file << Palette[i];
     }
@@ -116,6 +100,7 @@ void Bitmap::out_bmp(const char * fname) {
         //WriteFile (hFile, &data[i], sizeof(char), &RW, NULL);
         file << &data[i];
     }
-    //CloseHandle(hFile);
+
+*/
 }
 
