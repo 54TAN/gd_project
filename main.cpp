@@ -18,14 +18,14 @@ int main(int argc, char ** argv) {
     my_map.width = width;
     my_map.height = height;
 
-    my_map.obstacles.push_back(Obstacle(GeomVector(180, 0), GeomVector(190, 300)));
-    my_map.obstacles.push_back(Obstacle(GeomVector(380, 120), GeomVector(390, 500)));
-    my_map.obstacles.push_back(Obstacle(GeomVector(560, 330), GeomVector(570, 500)));
-    my_map.obstacles.push_back(Obstacle(GeomVector(490, 250), GeomVector(700, 260)));
-    my_map.obstacles.push_back(Obstacle(GeomVector(620, 430), GeomVector(700, 440)));
-    my_map.obstacles.push_back(Obstacle(GeomVector(660, 460), GeomVector(670, 500))); //финальная висяка*//*
-    my_map.points.push_back(GeomVector(2, 2));
-    my_map.points.push_back(GeomVector(698, 498));
+    my_map.obstacles.push_back(Obstacle(Point(180, 0), Point(190, 300)));
+    my_map.obstacles.push_back(Obstacle(Point(380, 120), Point(390, 500)));
+    my_map.obstacles.push_back(Obstacle(Point(560, 330), Point(570, 500)));
+    my_map.obstacles.push_back(Obstacle(Point(490, 250), Point(700, 260)));
+    my_map.obstacles.push_back(Obstacle(Point(620, 430), Point(700, 440)));
+    my_map.obstacles.push_back(Obstacle(Point(660, 460), Point(670, 500))); //финальная висяка*//*
+    my_map.points.push_back(Point(2, 2));
+    my_map.points.push_back(Point(698, 498));
 
     clock_t t = clock();
 

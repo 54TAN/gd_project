@@ -2,14 +2,14 @@
 #define GD_PROJECT_RRTNODE_H
 
 #include <vector>
-#include "GeomVector.h"
+#include "Point.h"
 
 struct RrtNode {
     int parent;
     std::vector<int> children;
-    GeomVector point;
+    Point point;
 
-    RrtNode(GeomVector generated_point, int parent = -1);
+    RrtNode(Point generated_point, int parent = -1);
     void output();
     bool operator==(const RrtNode& right);
 };

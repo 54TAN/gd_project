@@ -26,7 +26,7 @@ RrTree::RrTree(Map* the_map, double distance, bool search) :
 
 void RrTree::extend(Map* the_map, KdTree * kd, bool search)
 {
-    GeomVector new_point = the_map->points.back();
+    Point new_point = the_map->points.back();
     double temp[2] = {new_point.x, new_point.y};
     double best_distance = the_map->width * the_map->height;
     int best_index = -1;
@@ -59,6 +59,7 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search)
         nodes[best_index].children.push_back(nodes.size() - 1);
         //std::cout << "/* message */" << '\n';
     } else {
+        the_map->points.pop_back();
         return;
     }
 }
@@ -74,14 +75,14 @@ void RrTree::get_path(int index)
     }
 }
 
-double RrTree::get_distance(GeomVector point_1, GeomVector point_2)
+double RrTree::get_distance(Point point_1, Point point_2)
 {
     return (point_1.x - point_2.x)*(point_1.x - point_2.x) +
            (point_1.y - point_2.y)*(point_1.y - point_2.y);
 
 }
 
-bool RrTree::is_available(Map* the_map, GeomVector point_1, GeomVector point_2)
+bool RrTree::is_available(Map* the_map, Point point_1, Point point_2)
 {
     if (the_map->obstacles.size() == 0) {
         return true;
@@ -102,7 +103,7 @@ bool RrTree::is_available(Map* the_map, GeomVector point_1, GeomVector point_2)
     for (size_t i = 0; i < the_map->width; i++) {
         for (size_t j = 0; j < the_map->height; j++) {
             if (temp_plain[i][j]) {
-                GeomVector pt((double)i, (double)j);
+                Point pt((double)i, (double)j);
                 if (!the_map->is_point_in_obstacle(pt)) {
                     for (size_t k = 0; k < the_map->width; k++) {
                         delete [] temp_plain[k];
@@ -127,7 +128,7 @@ void RrTree::go(int index)
 {
     edges.clear();
     
-    GeomVector temp = nodes[index].point;
+    Point temp = nodes[index].point;
 
     if (nodes[index].children.size() != 0) {
         for (size_t i = 0; i < nodes[index].children.size(); i++) {
@@ -135,7 +136,7 @@ void RrTree::go(int index)
             this->edges.push_back(nodes[nodes[index].children[i]].point);
         }
     }
-    //edges.push_back(GeomVector(-1, -1));
+    //edges.push_back(Point(-1, -1));
 
 
     //this->egdes.push_back(goal_state.point);

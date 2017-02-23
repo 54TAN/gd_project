@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-Obstacle::Obstacle(GeomVector other_min, GeomVector other_max) :
+Obstacle::Obstacle(Point other_min, Point other_max) :
         min_vec(other_min),
         max_vec(other_max)
 {

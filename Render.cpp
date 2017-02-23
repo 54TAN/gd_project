@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cmath>
 
-void bresenham(bool ** temp_plain, GeomVector point_1, GeomVector point_2, bool edge_path, Bitmap * bmp)
+void bresenham(bool ** temp_plain, Point point_1, Point point_2, bool edge_path, Bitmap * bmp)
 {
 
     int a = point_2.y - point_1.y;
@@ -56,7 +56,7 @@ void render_map(Map the_map, Bitmap * bmp)
 {
     for (int i = 0; i < bmp->width; i++) {
         for (int j = 0; j < bmp->height; j++) {
-            GeomVector pt((double)i, (double)j);
+            Point pt((double)i, (double)j);
             bool flag = !the_map.is_point_in_obstacle(pt) || the_map.among_points(pt);
             bmp->add_pix(i, j, flag, 0);
         }
@@ -64,7 +64,7 @@ void render_map(Map the_map, Bitmap * bmp)
 
 }
 
-void render_path(std::vector<GeomVector> path, Bitmap * bmp, bool edge_path)
+void render_path(std::vector<Point> path, Bitmap * bmp, bool edge_path)
 {/*
     bool ** temp_plain = new bool * [bmp->width];
     for (size_t i = 0; i < bmp->width; i++) {
@@ -88,7 +88,7 @@ void render_path(std::vector<GeomVector> path, Bitmap * bmp, bool edge_path)
     for (size_t i = 0; i < bmp->width; i++) {
         for (size_t j = 0; j < bmp->height; j++) {
             if (temp_plain[i][j]) {
-                GeomVector pt((double)i, (double)j);
+                Point pt((double)i, (double)j);
                 if (!the_map.is_point_in_obstacle(pt)) {
                     std::cout << "YOU SHELL NOT PAAAAASS!!!" << std::endl;
                     return;

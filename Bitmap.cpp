@@ -2,8 +2,6 @@
 
 #include <iostream>
 #include <cstring>
-#include <fstream>
-#include <iomanip>
 
 typedef unsigned DWORD; // was unsigned long
 typedef void * HANDLE;
@@ -80,6 +78,7 @@ void Bitmap::out_bmp(const char * fname) {
     bih.biHeight = height;
     bih.biWidth = width;
     bih.biPlanes = 1;
+
     FILE * f2 = fopen(fname, "w+b");
     fwrite(&bfh, sizeof(bfh), 1, f2);
     fwrite(&bih, sizeof(bih), 1, f2);

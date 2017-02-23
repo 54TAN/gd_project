@@ -1,7 +1,7 @@
 #include <iostream>
 #include "RrtNode.h"
 
-RrtNode::RrtNode(GeomVector generated_point, int parent) :
+RrtNode::RrtNode(Point generated_point, int parent) :
         point(generated_point)
 {
     this->parent = parent;

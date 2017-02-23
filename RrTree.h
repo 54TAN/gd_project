@@ -7,14 +7,14 @@
 
 struct RrTree {
     std::vector<RrtNode> nodes;
-    std::vector<GeomVector> path;
-    std::vector<GeomVector> edges;
+    std::vector<Point> path;
+    std::vector<Point> edges;
     RrtNode goal_state;
     double min_distance;
 
     RrTree(Map* the_map, double distance, bool search); // 1 = kd
-    bool is_available(Map* the_map, GeomVector point_1, GeomVector point_2);
-    double get_distance(GeomVector point_1, GeomVector point_2);
+    bool is_available(Map* the_map, Point point_1, Point point_2);
+    double get_distance(Point point_1, Point point_2);
     void extend(Map* the_map, KdTree * kd, bool search);
     void get_path(int index);
     void go(int index);
