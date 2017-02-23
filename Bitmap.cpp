@@ -1,5 +1,10 @@
 #include "Bitmap.h"
 
+#include <iostream>
+#include <cstring>
+#include <fstream>
+#include <iomanip>
+
 typedef unsigned DWORD; // was unsigned long
 typedef void * HANDLE;
 typedef unsigned char BYTE;
@@ -7,10 +12,6 @@ typedef unsigned short WORD;
 typedef int LONG; // was long, which means sizeof(2*int) on my computer
 
 #define BI_RGB 0
-
-#include <iostream>
-#include <cstring>
-#include <fstream>
 
 Bitmap::Bitmap(int w, int h) {
     width = w;
@@ -34,6 +35,7 @@ void Bitmap::add_pix(int i, int j, bool color, bool edge_path) {
     }
 }
 
+#pragma pack(push,1)
 typedef struct tagBITMAPFILEHEADER {
     WORD  bfType;
     DWORD bfSize;
@@ -41,7 +43,9 @@ typedef struct tagBITMAPFILEHEADER {
     WORD  bfReserved2; //
     DWORD bfOffBits;
 } BITMAPFILEHEADER;
+#pragma pack(pop)
 
+#pragma pack(push,1)
 typedef struct tagBITMAPINFOHEADER {
     DWORD biSize;
     LONG  biWidth;
@@ -55,7 +59,7 @@ typedef struct tagBITMAPINFOHEADER {
     DWORD biClrUsed;
     DWORD biClrImportant; //
 } BITMAPINFOHEADER;
-
+#pragma pack(pop)
 void Bitmap::out_bmp(const char * fname) {
 
     BITMAPFILEHEADER bfh;
@@ -78,29 +82,13 @@ void Bitmap::out_bmp(const char * fname) {
     bih.biHeight = height;
     bih.biWidth = width;
     bih.biPlanes = 1;
-
-    //hFile = CreateFile (fname, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
-    std::ofstream file(fname);
-    file << bfh.bfType << bfh.bfSize << bfh.bfReserved1 << bfh.bfReserved2 << bfh.bfOffBits;
-
-    file << bih.biSize << bih.biWidth << bih.biHeight << bih.biPlanes << bih.biBitCount
-         << bih.biCompression << bih.biSizeImage << bih.biXPelsPerMeter << bih.biYPelsPerMeter
-         << bih.biClrUsed << bih.biClrImportant;
-/*
-    for (int i = 0; i < 1024; i++) {
-        file << Palette[i];
-    }
-
-
-    //WriteFile (hFile, &bfh, sizeof(bfh), &RW, NULL);
-    //WriteFile (hFile, &bih, sizeof(bih), &RW, NULL);
-    //WriteFile (hFile, Palette, 1024, &RW, NULL);
-
+    FILE * f2 = fopen(fname, "w+b");
+    fwrite(&bfh, sizeof(bfh), 1, f2);
+    fwrite(&bih, sizeof(bih), 1, f2);
+    fwrite(&Palette, sizeof(Palette), 1, f2);
     for (size_t i = 0; i < height * width * 3; i++) {
-        //WriteFile (hFile, &data[i], sizeof(char), &RW, NULL);
-        file << &data[i];
+        fwrite(&data[i], sizeof(char), 1, f2);
     }
 
-*/
 }
 

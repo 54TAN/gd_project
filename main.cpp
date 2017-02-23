@@ -20,7 +20,7 @@ int main(int argc, char ** argv) {
 
     my_map.obstacles.push_back(Obstacle(GeomVector(180, 0), GeomVector(190, 300)));
     my_map.obstacles.push_back(Obstacle(GeomVector(380, 120), GeomVector(390, 500)));
-    /*my_map.obstacles.push_back(Obstacle(GeomVector(560, 330), GeomVector(570, 500)));
+    my_map.obstacles.push_back(Obstacle(GeomVector(560, 330), GeomVector(570, 500)));
     my_map.obstacles.push_back(Obstacle(GeomVector(490, 250), GeomVector(700, 260)));
     my_map.obstacles.push_back(Obstacle(GeomVector(620, 430), GeomVector(700, 440)));
     my_map.obstacles.push_back(Obstacle(GeomVector(660, 460), GeomVector(670, 500))); //финальная висяка*/
@@ -42,16 +42,6 @@ int main(int argc, char ** argv) {
     }
     render_path(my_rrt.path, &my_bmp, 1);
     my_bmp.out_bmp("MAP_PATH.bmp");
-
-    /*bitmap_t my_bmp(width, height);
-    render_map(my_map, &my_bmp);
-    for (size_t i = 0; i < my_rrt.nodes.size(); i++) {
-        my_rrt.go(i);
-        if (my_rrt.edges.size())
-            render_path(my_rrt.edges, &my_bmp, 0);
-    }
-    render_path(my_rrt.path, &my_bmp, 1);
-    my_bmp.out_bmp("MAP_PATH.bmp");*/
 
     return 0;
 }
