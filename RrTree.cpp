@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iostream>
 #include "RrTree.h"
 #include "Render.h"
 
@@ -7,16 +8,14 @@ RrTree::RrTree(Map* the_map, double distance, bool search) :
         min_distance(distance)
 {
     nodes.push_back(RrtNode(the_map->points.front())); // начальная точка
+
     double temp[2] = {the_map->points.front().x, the_map->points.front().y};
     KdTree kd;
     kd.nodes.push_back(KdNode(temp, 0));
     //std::cout << kd.nodes[0].value[0] << " " << kd.nodes[0].value[1] << '\n';
-
     //while (the_map->points.size() != 200000) {
     while (!is_available(the_map, nodes.back().point, goal_state.point)) {
-        //std::cout << "/* message */" << '\n';
         the_map->generate_points(1, the_map->width, the_map->height);
-
         this->extend(the_map, &kd, search);
     }
     //this->nodes.push_back(goal_state);
@@ -26,6 +25,8 @@ RrTree::RrTree(Map* the_map, double distance, bool search) :
 
 void RrTree::extend(Map* the_map, KdTree * kd, bool search)
 {
+    static int counter = 0;
+
     Point new_point = the_map->points.back();
     double temp[2] = {new_point.x, new_point.y};
     double best_distance = the_map->width * the_map->height;
@@ -57,6 +58,11 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search)
         nodes.push_back(RrtNode(new_point, best_index));
         kd->push(temp, 0, -1, -1);
         nodes[best_index].children.push_back(nodes.size() - 1);
+
+        counter++;
+        if (counter % 100)
+            std::cout << this->nodes.back().point.x << " "
+                      << this->nodes.back().point.y << std::endl;
         //std::cout << "/* message */" << '\n';
     } else {
         the_map->points.pop_back();

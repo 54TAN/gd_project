@@ -1,7 +1,6 @@
 #ifndef GD_PROJECT_Point_H
 #define GD_PROJECT_Point_H
 
-
 struct Point {
     double x;
     double y;
