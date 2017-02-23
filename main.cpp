@@ -26,7 +26,7 @@ int main(int argc, char ** argv) {
 
     clock_t t = clock();
 
-    RrTree my_rrt(&my_map, 50, 1);
+    RrTree my_rrt(&my_map, 30, 1);
     my_rrt.get_path(my_rrt.nodes.size() - 1);
 
     t = (clock() - t) / CLOCKS_PER_SEC;

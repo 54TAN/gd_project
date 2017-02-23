@@ -48,7 +48,7 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search)
         if (counter % 50) {
             if (this->nodes.back().point.x > current) {
                 current = this->nodes.back().point.x;
-                std::cout << current << std::endl;
+                std::cout << current / 10.0 << std::endl;
             }
         }
     } else {
