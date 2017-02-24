@@ -3,7 +3,7 @@
 #include "RrTree.h"
 #include "Render.h"
 
-RrTree::RrTree(Map* the_map, double distance, bool search) :
+RrTree::RrTree(Map* the_map, double distance, bool search, Bitmap * bmp) :
         goal_state(RrtNode(the_map->points.back())),
         min_distance(distance)
 {
@@ -13,11 +13,14 @@ RrTree::RrTree(Map* the_map, double distance, bool search) :
     kd.nodes.push_back(KdNode(temp, 0));
     while (!is_available(the_map, nodes.back().point, goal_state.point)) {
         the_map->generate_points(1, the_map->width, the_map->height);
-        this->extend(the_map, &kd, search);
+        this->extend(the_map, &kd, search, bmp);
     }
+    get_path(nodes.size() - 1);
+    render_path(path, bmp, 1);
+    bmp->out_bmp("MAP_PATH.bmp");
 }
 
-void RrTree::extend(Map* the_map, KdTree * kd, bool search)
+void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp)
 {
     static int counter = 0;
     static int current = 0;
@@ -44,6 +47,14 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search)
         kd->push(temp, 0, -1, -1);
         nodes[best_index].children.push_back(nodes.size() - 1);
 
+        //out in .bmp
+        for (size_t i = 0; i < nodes.size(); i++) {
+            go(i);
+            if (edges.size())
+                render_path(edges, bmp, 0);
+        }
+
+        //info to cmd
         counter++;
         if (counter % 50) {
             if (this->nodes.back().point.x > current) {
@@ -51,6 +62,7 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search)
                 std::cout << current / 10.0 << std::endl;
             }
         }
+        bmp->out_bmp("MAP_PATH.bmp");
     } else {
         the_map->points.pop_back();
         return;

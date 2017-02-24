@@ -43,25 +43,14 @@ void make_picture(RrTree & rrt, Map const& map) {
     my_bmp.out_bmp("MAP_PATH.bmp");
 }
 
-
-
-
-
-
-
-
-
-
 static GLfloat spin = 0.0;
 
-void init(void)
-{
+void init(void) {
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glShadeModel(GL_FLAT);
 }
 
-void display(void)
-{
+void display(void) {
     glClear(GL_COLOR_BUFFER_BIT);
     glPushMatrix();
     glRotatef(spin, 0.0, 0.0, 1.0);
@@ -71,19 +60,16 @@ void display(void)
     glutSwapBuffers();
 }
 
-/*
-void spinDisplay(void)
-{
+
+void spinDisplay(void) {
     spin = spin + 2.0;
     if (spin > 360.0)
         spin = spin - 360.0;
     glutPostRedisplay();
 }
-*/
 
-/*
-void reshape(int w, int h)
-{
+
+void reshape(int w, int h) {
     glViewport(0, 0, (GLsizei) w, (GLsizei) h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -91,11 +77,10 @@ void reshape(int w, int h)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
-*/
 
-/*
-void mouse(int button, int state, int x, int y)
-{
+
+
+void mouse(int button, int state, int x, int y) {
     switch (button) {
         case GLUT_LEFT_BUTTON:
             if (state == GLUT_DOWN)
@@ -109,12 +94,16 @@ void mouse(int button, int state, int x, int y)
             break;
     }
 }
-*/
+
 
 void process_in_window(int c, char ** v, Map & map) {
-    RrTree my_rrt(&map, 100, 1);
+    Bitmap bmp(map.width, map.height);
+    render_map(map, &bmp);
+    bmp.out_bmp("MAP_PATH.bmp");
+    RrTree my_rrt(&map, 50, 1, &bmp);
+
     my_rrt.get_path(my_rrt.nodes.size() - 1);
-    make_picture(my_rrt, map);
+/*
 
     glutInit(&c, v);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
@@ -123,9 +112,10 @@ void process_in_window(int c, char ** v, Map & map) {
     glutCreateWindow(v[0]);
     init();
     glutDisplayFunc(display);
-    //glutReshapeFunc(reshape);
-    //glutMouseFunc(mouse);
+    glutReshapeFunc(reshape);
+    glutMouseFunc(mouse);
     glutMainLoop();
+*/
 }
 
 int main(int argc, char ** argv) {
@@ -139,18 +129,6 @@ int main(int argc, char ** argv) {
     make_map(width, height, my_map);
 
     process_in_window(argc, argv, my_map);
-/*
 
-    clock_t t = clock();
-
-    RrTree my_rrt(&my_map, 5000, 1);
-    my_rrt.get_path(my_rrt.nodes.size() - 1);
-
-    t = (clock() - t) / CLOCKS_PER_SEC;
-
-    out_info(my_rrt, my_map, t);
-    make_picture(my_rrt, my_map);
-
-*/
     return 0;
 }
