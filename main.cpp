@@ -101,7 +101,7 @@ void process_in_window(int c, char ** v, Map & map) {
     render_map(map, &bmp);
     bmp.out_bmp("MAP_PATH.bmp");
 
-    RrTree rrt(&map, 500);
+    RrTree rrt(&map, 30);
     //rrt.search(&map, 1, &bmp);
 
     double temp[2] = {map.points.front().x, map.points.front().y};
@@ -109,10 +109,22 @@ void process_in_window(int c, char ** v, Map & map) {
     kd.nodes.push_back(KdNode(temp, 0));
     while (!rrt.is_available(&map, rrt.nodes.back().point, rrt.goal_state.point)) {
         map.generate_points(1, map.width, map.height);
-        rrt.extend(&map, &kd, true, &bmp);
+        rrt.extend(&map, &kd, true);//, &bmp);
     }
+
+    for (size_t i = 0; i < rrt.nodes.size(); i++) {
+        rrt.go(i);
+        if (rrt.edges.size())
+            render_path(rrt.edges, &bmp, 0);
+    }
+    bmp.out_bmp("MAP_PATH.bmp");
+
     rrt.get_path(rrt.nodes.size() - 1);
+
     render_path(rrt.path, &bmp, 1);
+    bmp.out_bmp("MAP_PATH.bmp");
+    rrt.optimize_path(&map, 3, 20);
+    render_path(rrt.path, &bmp, 1, 1);
     bmp.out_bmp("MAP_PATH.bmp");
 
 

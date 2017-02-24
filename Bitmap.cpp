@@ -17,9 +17,16 @@ Bitmap::Bitmap(int w, int h) {
     data = new unsigned char [width*height*3];
 }
 
-void Bitmap::add_pix(int i, int j, bool color, bool edge_path) {
+void Bitmap::add_pix(int i, int j, bool color, bool edge_path, bool optimized) {
     size_t index = (j * width + i) * 3;
+
     if (edge_path) {
+        if (optimized) {
+            data[index] = (unsigned char) (0);
+            data[index + 1] = (unsigned char) (255);
+            data[index + 2] = (unsigned char) (0);
+            return;
+        }
         data[index] = (unsigned char) (0);
         data[index + 1] = (unsigned char) (0);
         data[index + 2] = (unsigned char) (255);

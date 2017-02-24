@@ -8,7 +8,7 @@ struct Bitmap {
     int height;
 
     Bitmap(int w, int h);
-    void add_pix(int i, int j, bool color, bool edge_path);
+    void add_pix(int i, int j, bool color, bool edge_path, bool optimized = 0);
     void out_bmp(const char * fname);
 };
 

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cmath>
 
-void bresenham(bool ** temp_plain, Point point_1, Point point_2, bool edge_path, Bitmap * bmp)
+void bresenham(bool ** temp_plain, Point point_1, Point point_2, bool edge_path, Bitmap * bmp, bool optimized)
 {
 
     int a = point_2.y - point_1.y;
@@ -42,8 +42,8 @@ void bresenham(bool ** temp_plain, Point point_1, Point point_2, bool edge_path,
         y += sign_a;
 
         if (bmp != NULL) {
-            if (op) bmp->add_pix(x, y, 1, edge_path); //додумать
-            else  bmp->add_pix(y, x, 1, edge_path); //додумать
+            if (op) bmp->add_pix(x, y, 1, edge_path, optimized); //додумать
+            else  bmp->add_pix(y, x, 1, edge_path, optimized); //додумать
 
         } else {
             if (op) temp_plain[x][y] = true;
@@ -64,7 +64,7 @@ void render_map(Map the_map, Bitmap * bmp)
 
 }
 
-void render_path(std::vector<Point> path, Bitmap * bmp, bool edge_path)
+void render_path(std::vector<Point> path, Bitmap * bmp, bool edge_path, bool optimized)
 {/*
     bool ** temp_plain = new bool * [bmp->width];
     for (size_t i = 0; i < bmp->width; i++) {
@@ -81,7 +81,7 @@ void render_path(std::vector<Point> path, Bitmap * bmp, bool edge_path)
         if (path[i].x == -1) {
             continue;
         }
-        bresenham(some, path[i], path[i + 1], edge_path, bmp);
+        bresenham(some, path[i], path[i + 1], edge_path, bmp, optimized);
     }
     //
     /*

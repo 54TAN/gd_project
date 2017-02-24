@@ -50,13 +50,15 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp)
         kd->push(temp, 0, -1, -1);
         nodes[best_index].children.push_back(nodes.size() - 1);
 
-        //out in .bmp
-        for (size_t i = 0; i < nodes.size(); i++) {
-            go(i);
-            if (edges.size())
-                render_path(edges, bmp, 0);
+        if (bmp) {
+            //out in .bmp
+            for (size_t i = 0; i < nodes.size(); i++) {
+                go(i);
+                if (edges.size())
+                    render_path(edges, bmp, 0);
+            }
+            bmp->out_bmp("MAP_PATH.bmp");
         }
-
         //info to cmd
         counter++;
         if (counter % 50) {
@@ -65,7 +67,8 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp)
                 std::cout << current / 10.0 << std::endl;
             }
         }
-        bmp->out_bmp("MAP_PATH.bmp");
+
+
     } else {
         the_map->points.pop_back();
         return;
@@ -143,6 +146,17 @@ void RrTree::go(int index)
             this->edges.push_back(temp);
             this->edges.push_back(nodes[nodes[index].children[i]].point);
         }
+    }
+}
+
+void RrTree::optimize_path(Map * map, int step, int iter) {
+    while (iter) {
+        for (int i = 0; i < path.size() - step; i++) {
+            if (is_available(map, path[i], path[i + step])) {
+                path.erase(path.begin() + i + 1, path.begin() + i + step - 1);
+            }
+        }
+        iter--;
     }
 }
 
