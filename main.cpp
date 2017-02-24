@@ -50,6 +50,7 @@ void init(void) {
     glShadeModel(GL_FLAT);
 }
 
+
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT);
     glPushMatrix();
@@ -79,7 +80,6 @@ void reshape(int w, int h) {
 }
 
 
-
 void mouse(int button, int state, int x, int y) {
     switch (button) {
         case GLUT_LEFT_BUTTON:
@@ -100,9 +100,22 @@ void process_in_window(int c, char ** v, Map & map) {
     Bitmap bmp(map.width, map.height);
     render_map(map, &bmp);
     bmp.out_bmp("MAP_PATH.bmp");
-    RrTree my_rrt(&map, 50, 1, &bmp);
 
-    my_rrt.get_path(my_rrt.nodes.size() - 1);
+    RrTree rrt(&map, 500);
+    //rrt.search(&map, 1, &bmp);
+
+    double temp[2] = {map.points.front().x, map.points.front().y};
+    KdTree kd;
+    kd.nodes.push_back(KdNode(temp, 0));
+    while (!rrt.is_available(&map, rrt.nodes.back().point, rrt.goal_state.point)) {
+        map.generate_points(1, map.width, map.height);
+        rrt.extend(&map, &kd, true, &bmp);
+    }
+    rrt.get_path(rrt.nodes.size() - 1);
+    render_path(rrt.path, &bmp, 1);
+    bmp.out_bmp("MAP_PATH.bmp");
+
+
 /*
 
     glutInit(&c, v);

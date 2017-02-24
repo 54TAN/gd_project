@@ -13,7 +13,8 @@ struct RrTree {
     RrtNode goal_state;
     double min_distance;
 
-    RrTree(Map* the_map, double distance, bool search, Bitmap * bmp = NULL); // 1 = kd
+    RrTree(Map* the_map, double distance); // 1 = kd
+    void search(Map* the_map, bool search, Bitmap * bmp = NULL);
     bool is_available(Map* the_map, Point point_1, Point point_2);
     double get_distance(Point point_1, Point point_2);
     void extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp);

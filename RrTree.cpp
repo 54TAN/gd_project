@@ -3,11 +3,14 @@
 #include "RrTree.h"
 #include "Render.h"
 
-RrTree::RrTree(Map* the_map, double distance, bool search, Bitmap * bmp) :
+RrTree::RrTree(Map* the_map, double distance) :
         goal_state(RrtNode(the_map->points.back())),
         min_distance(distance)
 {
     nodes.push_back(RrtNode(the_map->points.front()));
+}
+
+void RrTree::search(Map* the_map, bool search, Bitmap * bmp) {
     double temp[2] = {the_map->points.front().x, the_map->points.front().y};
     KdTree kd;
     kd.nodes.push_back(KdNode(temp, 0));
@@ -142,3 +145,5 @@ void RrTree::go(int index)
         }
     }
 }
+
+
