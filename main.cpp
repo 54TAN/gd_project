@@ -72,14 +72,14 @@ void display(void) {
     glutSwapBuffers();
 }
 
-void timf(int value) { // Timer function{
+void timf(int value) {
     Map map;
     make_map(width, height, map);
     Bitmap bmp(map.width, map.height);
     render_map(map, &bmp);
     bmp.out_bmp("MAP_PATH.bmp");
 
-    RrTree rrt(&map, 50);
+    RrTree rrt(&map, 200);
     //rrt.search(&map, 1, &bmp);
 
     double temp[2] = {map.points.front().x, map.points.front().y};
@@ -91,14 +91,6 @@ void timf(int value) { // Timer function{
         display();
     }
 
-    /*
-    for (size_t i = 0; i < rrt.nodes.size(); i++) {
-        rrt.go(i);
-        if (rrt.edges.size())
-            render_path(rrt.edges, &bmp, 0);
-    }
-    bmp.out_bmp("MAP_PATH.bmp");
-*/
     rrt.get_path(rrt.nodes.size() - 1);
     render_path(rrt.path, &bmp, 1);
     bmp.out_bmp("MAP_PATH.bmp");
@@ -111,79 +103,11 @@ void timf(int value) { // Timer function{
     //glutTimerFunc(40, timf, 0); // Setup next timer
 }
 
-void process_in_window(int c, char ** v, Map & map) {
-/*
-
-    Bitmap bmp(map.width, map.height);
-    render_map(map, &bmp);
-    bmp.out_bmp("MAP_PATH.bmp");
-
-    RrTree rrt(&map, 3000);
-    //rrt.search(&map, 1, &bmp);
-
-
-
-    double temp[2] = {map.points.front().x, map.points.front().y};
-    KdTree kd;
-    kd.nodes.push_back(KdNode(temp, 0));
-    while (!rrt.is_available(&map, rrt.nodes.back().point, rrt.goal_state.point)) {
-        map.generate_points(1, map.width, map.height);
-        rrt.extend(&map, &kd, true);//, &bmp);
-    }
-
-
-    for (size_t i = 0; i < rrt.nodes.size(); i++) {
-        rrt.go(i);
-        if (rrt.edges.size())
-            render_path(rrt.edges, &bmp, 0);
-    }
-    bmp.out_bmp("MAP_PATH.bmp");
-
-    rrt.get_path(rrt.nodes.size() - 1);
-
-    render_path(rrt.path, &bmp, 1);
-    bmp.out_bmp("MAP_PATH.bmp");
-    rrt.optimize_path(&map, 3, 20);
-    render_path(rrt.path, &bmp, 1, 1);
-    bmp.out_bmp("MAP_PATH.bmp");
-
-*/
-    glutInit(&c, v);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-    glutInitWindowSize(width, height);
-    glutInitWindowPosition(100, 100);
-    glutCreateWindow(v[0]);
-    init();
-    glutDisplayFunc(display);
-    glutTimerFunc(4, timf, 0); // Set up timer for 40ms, about 25 fps
-    //glutReshapeFunc(reshape);
-    glutMainLoop();
-
-
-
-/*
-    glutInit(&c, v);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-    glutInitWindowSize(map.width, map.height);
-    glutInitWindowPosition(100, 100);
-    glutCreateWindow(v[0]);
-    init();
-    glutDisplayFunc(display);
-    glutReshapeFunc(reshape);
-    glutMouseFunc(mouse);
-    glutMainLoop();
-*/
-}
 
 int main(int argc, char ** argv) {
 
     srand(time(NULL));
 
-
-
-
-
-    //process_in_window(argc, argv, my_map);
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(width, height);
@@ -191,8 +115,7 @@ int main(int argc, char ** argv) {
     glutCreateWindow(argv[0]);
     init();
     glutDisplayFunc(display);
-    glutTimerFunc(4, timf, 0); // Set up timer for 40ms, about 25 fps
-    //glutReshapeFunc(reshape);
+    glutTimerFunc(4, timf, 0);
     glutMainLoop();
 
     return 0;
