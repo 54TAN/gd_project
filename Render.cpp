@@ -3,7 +3,8 @@
 #include <iostream>
 #include <cmath>
 
-void bresenham(bool ** temp_plain, Coordinates point_1, Coordinates point_2, bool edge_path, Bitmap * bmp, bool optimized)
+void bresenham(bool ** temp_plain, Coordinates point_1, Coordinates point_2,
+               bool edge_path, Bitmap * bmp, bool optimized)
 {
 
     int a = point_2.y - point_1.y;

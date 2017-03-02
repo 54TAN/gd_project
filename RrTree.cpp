@@ -17,10 +17,10 @@ void RrTree::search(Map* the_map, bool search, Bitmap * bmp) {
     while (!is_available(the_map, nodes.back().point, goal_state.point)) {
         the_map->generate_points(1, the_map->width, the_map->height);
         this->extend(the_map, &kd, search, bmp);
-    }
+    }/*
     get_path(nodes.size() - 1);
     render_path(path, bmp, 1);
-    bmp->out_bmp("MAP_PATH.bmp");
+    bmp->out_bmp("MAP_PATH.bmp");*/
 }
 
 void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp)

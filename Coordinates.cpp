@@ -4,27 +4,33 @@
 #include <fstream>
 #include <iomanip>
 
-Coordinates::Coordinates(double x_coord, double y_coord, double phi) :
+Coordinates::Coordinates(double x_coord, double y_coord, double phi, double length) :
         x(x_coord),
         y(y_coord),
-        phi(phi)
+        phi(phi),
+        length(length)
 {
     coords.push_back(x);
     coords.push_back(y);
     coords.push_back(phi);
+    coords.push_back(length);
 }
 
 Coordinates::Coordinates(const Coordinates &other_vec) :
         x(other_vec.x),
         y(other_vec.y),
-        phi(other_vec.phi)
-{}
+        phi(other_vec.phi),
+        length(other_vec.length)
+{
+    coords = other_vec.coords;
+}
 
 Coordinates Coordinates::operator=(const Coordinates & other_vec)
 {
     x = other_vec.x;
     y = other_vec.y;
     phi = other_vec.phi;
+    length = other_vec.length;
     coords = other_vec.coords;
     return *this;
 }

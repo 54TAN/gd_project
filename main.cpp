@@ -9,10 +9,13 @@
 #include <cmath>
 #include <ctime>
 
+#define _USE_MATH_DEFINES
+
+std::vector <Coordinates> go_path;
+Coordinates MovableObject(2, 498, (-3/2.0) * M_PI, 50);
+
 unsigned int width = 1000;
 unsigned int height = 500;
-
-static GLfloat spin = 0.0;
 
 void make_map(int width, int height, Map & map) {
     map.height = height;
@@ -22,35 +25,6 @@ void make_map(int width, int height, Map & map) {
     map.obstacles.push_back(Obstacle(Coordinates(580, 0), Coordinates(590, 300)));
     map.points.push_back(Coordinates(2, 498));
     map.points.push_back(Coordinates(998, 498));
-}
-
-void out_info(RrTree const& rrt, Map const& map, clock_t time = -1) {
-    int hours = time / 3600;
-    int minutes = (time - hours * 3600) / 60;
-    int seconds = time - hours * 3600 - minutes * 60;
-    if (time != -1) {
-        std::cout << "points map : " << map.points.size() << '\n';
-        std::cout << "rrt points : " << rrt.nodes.size() << '\n';
-        std::cout << "path points : " << rrt.path.size() << '\n';
-        std::cout << "time : " << hours << ":" << minutes << ":" << seconds << std::endl;
-    }
-}
-
-void make_picture(RrTree & rrt, Map const& map) {
-    Bitmap my_bmp(map.width, map.height);
-    render_map(map, &my_bmp);
-    for (size_t i = 0; i < rrt.nodes.size(); i++) {
-        rrt.go(i);
-        if (rrt.edges.size())
-            render_path(rrt.edges, &my_bmp, 0);
-    }
-    render_path(rrt.path, &my_bmp, 1);
-    my_bmp.out_bmp("MAP_PATH.bmp");
-}
-
-void init(void) {
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    glShadeModel(GL_FLAT);
 }
 
 void display(void) {
@@ -72,50 +46,68 @@ void display(void) {
     glutSwapBuffers();
 }
 
-void timf(int value) {
-    Map map;
-    make_map(width, height, map);
-    Bitmap bmp(map.width, map.height);
+Bitmap bmp(width, height);
+Map map;
+
+void move() {
     render_map(map, &bmp);
     bmp.out_bmp("MAP_PATH.bmp");
+    std::vector <Coordinates> current_coords;
+    MovableObject.x += 3;
 
-    RrTree rrt(&map, 200);
-    //rrt.search(&map, 1, &bmp);
-
-    double temp[2] = {map.points.front().x, map.points.front().y};
-    KdTree kd;
-    kd.nodes.push_back(KdNode(temp, 0));
-    while (!rrt.is_available(&map, rrt.nodes.back().point, rrt.goal_state.point)) {
-        map.generate_points(1, map.width, map.height);
-        rrt.extend(&map, &kd, true, &bmp);
-        display();
-    }
-
-    rrt.get_path(rrt.nodes.size() - 1);
-    render_path(rrt.path, &bmp, 1);
+    current_coords.push_back(MovableObject);
+    current_coords.push_back(Coordinates(MovableObject.x, MovableObject.y - MovableObject.length));
+    render_path(current_coords, &bmp, 0);
     bmp.out_bmp("MAP_PATH.bmp");
     glutPostRedisplay();
-    rrt.optimize_path(&map, 3, 10);
-    render_path(rrt.path, &bmp, 1, 1);
-    bmp.out_bmp("MAP_PATH.bmp");
-    glutPostRedisplay();  // Redraw windows
-
-    //glutTimerFunc(40, timf, 0); // Setup next timer
 }
 
+void timer(int value) {
+    move();
+    display();
+    glutTimerFunc(5, timer, 0);
+}
+
+void mouse(int button, int state, int x, int y)
+{
+    switch (button) {
+        case GLUT_LEFT_BUTTON:
+            if (state == GLUT_DOWN)
+                glutIdleFunc(move);
+            break;
+    }
+}
 
 int main(int argc, char ** argv) {
 
     srand(time(NULL));
+
+
+    make_map(width, height, map);
+    //Bitmap bmp(map.width, map.height);
+    render_map(map, &bmp);
+    bmp.out_bmp("MAP_PATH.bmp");
+
+/*
+    RrTree rrt(&map, 2000);
+    rrt.search(&map, 1);
+    rrt.get_path(rrt.nodes.size() - 1);
+    rrt.optimize_path(&map, 3, 10);
+
+    go_path = rrt.path;
+*/
+
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(width, height);
     glutInitWindowPosition(100, 100);
     glutCreateWindow(argv[0]);
-    init();
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glShadeModel(GL_FLAT);
     glutDisplayFunc(display);
-    glutTimerFunc(4, timf, 0);
+    //glutTimerFunc(1, timer, 0);
+    glutMouseFunc(mouse);
     glutMainLoop();
 
     return 0;
