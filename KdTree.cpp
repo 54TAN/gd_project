@@ -2,9 +2,8 @@
 #include "KdTree.h"
 
 //#include <iostream>
-
-void KdTree::input(const char * filename)
-{
+/*
+void KdTree::input(const char * filename) {
     std::ifstream input_file(filename);
 
     double temp[N] = {0};
@@ -23,17 +22,17 @@ void KdTree::input(const char * filename)
 
     input_file.close();
 }
-
-void KdTree::push(double * temp, int index_vec, int index_dev, int index_par)
+*/
+void KdTree::push(std::vector<double>  temp, int index_vec, int index_dev, int index_par)
 {
     /** next split axis */
     index_dev = (index_dev + 1) % N;
 
     if (index_vec == -1) {
         index_vec = nodes.size();
-        nodes.insert(nodes.end(), KdNode(temp, index_dev));
+        nodes.insert(nodes.end(), KdNode(&temp, index_dev));
         KdNode & n = nodes[index_par];
-        if (nodes[index_vec].value[n.split_index] >= n.value[n.split_index]) {
+        if (nodes[index_vec].coords[n.split_index] >= n.coords[n.split_index]) {
             n.right = index_vec;
         } else {
             n.left = index_vec;
@@ -41,20 +40,21 @@ void KdTree::push(double * temp, int index_vec, int index_dev, int index_par)
     } else {
         KdNode & n = nodes[index_vec];
         double value = temp[index_dev];
-        int next = (value >= n.value[n.split_index])
+        int next = (value >= n.coords[n.split_index])
                    ? n.right
                    : n.left;
 
         push(temp, next, index_dev, index_vec);
     }
 }
-
+/*
 static
 std::string get_info(const KdNode & n)
 {
     std::string info;
     for (size_t i = 0 ; i < N ; i++) {
-        info += ((i > 0) ? " " : "") + std::to_string((int)n.value[i]);
+        info += ((i > 0) ? " " : "") + std::to_string((int)n.coords[i]);
+
     }
     return info;
 }
@@ -70,10 +70,14 @@ void save_link(std::ostream &output_file, const std::string & color, int parent_
     output_file << "\tN" << parent_index << " -> ";
     output_file  << "N" << child_index << "[color=" << color << ",penwidth=3.0]" << ";" << std::endl;
 }
+*/
+/*
 
 void KdTree::save(std::ostream &output_file)
 {
-    /* save node IDs */
+    */
+/* save node IDs *//*
+
     output_file << "digraph {" << std::endl;
     output_file << "# Nodes:" << std::endl;
 
@@ -85,7 +89,9 @@ void KdTree::save(std::ostream &output_file)
 
     output_file << "# Links:" << std::endl;
 
-    /* save links between nodes */
+    */
+/* save links between nodes *//*
+
     for (std::size_t i = 0 ; i < sz ; i++)
     {
         save_link(output_file, "blue", i, nodes[i].left);
@@ -94,8 +100,9 @@ void KdTree::save(std::ostream &output_file)
 
     output_file << "}" << std::endl;
 }
+*/
 
-double KdTree::get_distance(double * node_1, double * node_2)
+double KdTree::get_distance(std::vector <double> node_1, std::vector <double> node_2)
 {
     double dist = 0, tmp;
     for (size_t i = 0; i < N; i++) {
@@ -105,15 +112,15 @@ double KdTree::get_distance(double * node_1, double * node_2)
     return dist;
 }
 
-void KdTree::seek_nearest_with_kd(int index_root, double * other_node_coordinates,
+void KdTree::seek_nearest_with_kd(int index_root, std::vector <double> other_node_coordinates,
                                    int index_dev, int & best_index, double & best_distance)
 {
     if (index_root == -1) return;
 
     KdNode & n = nodes[index_root]; // current node in the tree
 
-    double distance = get_distance(n.value, other_node_coordinates);
-    double temp_direction = n.value[n.split_index] - other_node_coordinates[index_dev];
+    double distance = get_distance(n.coords, other_node_coordinates);
+    double temp_direction = n.coords[n.split_index] - other_node_coordinates[index_dev];
     double temp_2 = temp_direction*temp_direction;
 
     if (best_index == -1 || distance < best_distance) {
@@ -129,6 +136,7 @@ void KdTree::seek_nearest_with_kd(int index_root, double * other_node_coordinate
     seek_nearest_with_kd(temp_direction > 0 ? n.right : n.left,
                          other_node_coordinates, index_dev, best_index, best_distance);
 }
+/*
 
 void KdTree::seek_nearest_linear(double * other_node_coordinates, int & best_index, double & best_distance)
 {
@@ -151,3 +159,4 @@ size_t KdTree::get_size()
 {
     return nodes.size();
 }
+*/

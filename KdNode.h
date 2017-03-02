@@ -2,14 +2,15 @@
 #define GD_PROJECT_KDNODE_H
 
 #include "Consts.h"
+#include "Coordinates.h"
 
 struct KdNode {
-    double value[N];
+    std::vector <double> coords;
     int split_index;
     int left;
     int right;
 
-    KdNode(double * values = 0, int index = 0);
+    KdNode(std::vector <double> * point = 0, int index = 0);
 };
 
 

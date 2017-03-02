@@ -11,29 +11,32 @@ RrTree::RrTree(Map* the_map, double distance) :
 }
 
 void RrTree::search(Map* the_map, bool search, Bitmap * bmp) {
-    double temp[2] = {the_map->points.front().x, the_map->points.front().y};
+    //double temp[2] = {the_map->points.front().x, the_map->points.front().y};
     KdTree kd;
-    kd.nodes.push_back(KdNode(temp, 0));
+    kd.nodes.push_back(KdNode(&the_map->points.front().coords, 0));
+    //std::cout << nodes.size() << std::endl;
     while (!is_available(the_map, nodes.back().point, goal_state.point)) {
-        the_map->generate_points(1, the_map->width, the_map->height);
+        //std::cout << nodes.size() << std::endl;
+        the_map->generate_points(1, the_map->width, the_map->height, the_map->points[0].length);
         this->extend(the_map, &kd, search, bmp);
+        //std::cout << nodes.size() << std::endl;
     }/*
     get_path(nodes.size() - 1);
     render_path(path, bmp, 1);
     bmp->out_bmp("MAP_PATH.bmp");*/
 }
 
-void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp)
-{
-    static int counter = 0;
-    static int current = 0;
+void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp) {
 
-    Coordinates new_point = the_map->points.back();
-    double temp[2] = {new_point.x, new_point.y};
+    static int counter = 0;
+    static double current = 0;
+
+    Coordinates new_point = the_map->points.back(); // взяли только что сгенерир точку
     double best_distance = the_map->width * the_map->height;
     int best_index = -1;
     if (search) {
-        kd->seek_nearest_with_kd(0, temp, 0, best_index, best_distance);
+        //std::cout << "Sdsdsdsd" << std::endl;
+        kd->seek_nearest_with_kd(0, new_point.coords, 0, best_index, best_distance);
     } else {
         for (size_t i = 0; i < nodes.size(); i++) {
             double tmp = get_distance(new_point, nodes[i].point);
@@ -43,11 +46,12 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp)
             }
         }
     }
-
-    if ((this->is_available(the_map, new_point, nodes[best_index].point))  &&
+    //std::cout << "Sdsdsdsd" << std::endl;
+    if (!is_available(the_map, new_point, nodes[best_index].point)  &&
         sqrt(best_distance) <= this->min_distance) {
+
         nodes.push_back(RrtNode(new_point, best_index));
-        kd->push(temp, 0, -1, -1);
+        kd->push(new_point.coords, 0, -1, -1);
         nodes[best_index].children.push_back(nodes.size() - 1);
 
         if (bmp) {
@@ -76,8 +80,7 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp)
     }
 }
 
-void RrTree::get_path(int index)
-{
+void RrTree::get_path(int index) {
     if (index == nodes.size() - 1) {
         path.push_back(goal_state.point);
     }
@@ -87,8 +90,7 @@ void RrTree::get_path(int index)
     }
 }
 
-double RrTree::get_distance(Coordinates point_1, Coordinates point_2)
-{
+double RrTree::get_distance(Coordinates point_1, Coordinates point_2) {
     return (point_1.x - point_2.x)*(point_1.x - point_2.x) +
            (point_1.y - point_2.y)*(point_1.y - point_2.y);
 
@@ -97,9 +99,9 @@ double RrTree::get_distance(Coordinates point_1, Coordinates point_2)
 bool RrTree::is_available(Map* the_map, Coordinates point_1, Coordinates point_2)
 {
     if (the_map->obstacles.size() == 0) {
-        return true;
+        return false;
     }
-
+    //std::cout << "Sdsdsdsd" << std::endl;
     bool ** temp_plain = new bool * [the_map->width];
     for (size_t i = 0; i < the_map->width; i++) {
         temp_plain[i] = new bool [the_map->height];
@@ -110,8 +112,8 @@ bool RrTree::is_available(Map* the_map, Coordinates point_1, Coordinates point_2
         }
     }
 
-    bresenham(temp_plain, point_1, point_2, 0);
-
+    bresenham_obj(temp_plain, point_1, point_2);
+    //std::cout << "Sdsdsdsd" << std::endl;
     for (size_t i = 0; i < the_map->width; i++) {
         for (size_t j = 0; j < the_map->height; j++) {
             if (temp_plain[i][j]) {
@@ -122,7 +124,7 @@ bool RrTree::is_available(Map* the_map, Coordinates point_1, Coordinates point_2
                     }
                     delete temp_plain;
                     //std::cout << "YOU SHELL NOT PAAAAASS!!!" << std::endl;
-                    return false;
+                    return true;
                 }
             }
         }
@@ -133,11 +135,10 @@ bool RrTree::is_available(Map* the_map, Coordinates point_1, Coordinates point_2
     }
     delete temp_plain;
 
-    return true;
+    return false;
 }
 
-void RrTree::go(int index)
-{
+void RrTree::go(int index) {
     edges.clear();
     
     Coordinates temp = nodes[index].point;
