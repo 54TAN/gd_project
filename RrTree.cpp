@@ -58,6 +58,7 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp)
                     render_path(edges, bmp, 0);
             }
             bmp->out_bmp("MAP_PATH.bmp");
+
         }
         //info to cmd
         counter++;

@@ -9,6 +9,9 @@
 #include <cmath>
 #include <ctime>
 
+unsigned int width = 1000;
+unsigned int height = 500;
+
 static GLfloat spin = 0.0;
 
 void make_map(int width, int height, Map & map) {
@@ -51,53 +54,74 @@ void init(void) {
 }
 
 void display(void) {
-    glClear(GL_COLOR_BUFFER_BIT);
-    glPushMatrix();
-    glRotatef(spin, 0.0, 0.0, 1.0);
-    glColor3f(1.0, 1.0, 1.0);
-    glRectf(-25.0, -25.0, 25.0, 25.0);
-    glPopMatrix();
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    unsigned char header[54];
+    unsigned char palette[1024];
+    unsigned int imageSize = width * height * 3;
+    unsigned char * data = new unsigned char [imageSize];
+
+    FILE * file = fopen("MAP_PATH.bmp", "rb");
+    fread(header, 1, 54, file);
+    fread(palette, 1, 1024, file);
+    fread(data, 1, imageSize, file);
+    fclose(file);
+
+    glDrawPixels(width, height, GL_BGR, GL_UNSIGNED_BYTE, data);
     glutSwapBuffers();
 }
 
-void spinDisplay(void) {
-    spin = spin + 2.0;
-    if (spin > 360.0)
-        spin = spin - 360.0;
-    glutPostRedisplay();
-}
-
-void reshape(int w, int h) {
-    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-50.0, 50.0, -50.0, 50.0, -1.0, 1.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-}
-
-void mouse(int button, int state, int x, int y) {
-    switch (button) {
-        case GLUT_LEFT_BUTTON:
-            if (state == GLUT_DOWN)
-                glutIdleFunc(spinDisplay);
-            break;
-        case GLUT_RIGHT_BUTTON:
-            if (state == GLUT_DOWN)
-                glutIdleFunc(NULL);
-            break;
-        default:
-            break;
-    }
-}
-
-void process_in_window(int c, char ** v, Map & map) {
+void timf(int value) { // Timer function{
+    Map map;
+    make_map(width, height, map);
     Bitmap bmp(map.width, map.height);
     render_map(map, &bmp);
     bmp.out_bmp("MAP_PATH.bmp");
 
-    RrTree rrt(&map, 300);
+    RrTree rrt(&map, 50);
     //rrt.search(&map, 1, &bmp);
+
+    double temp[2] = {map.points.front().x, map.points.front().y};
+    KdTree kd;
+    kd.nodes.push_back(KdNode(temp, 0));
+    while (!rrt.is_available(&map, rrt.nodes.back().point, rrt.goal_state.point)) {
+        map.generate_points(1, map.width, map.height);
+        rrt.extend(&map, &kd, true, &bmp);
+        display();
+    }
+
+    /*
+    for (size_t i = 0; i < rrt.nodes.size(); i++) {
+        rrt.go(i);
+        if (rrt.edges.size())
+            render_path(rrt.edges, &bmp, 0);
+    }
+    bmp.out_bmp("MAP_PATH.bmp");
+*/
+    rrt.get_path(rrt.nodes.size() - 1);
+    render_path(rrt.path, &bmp, 1);
+    bmp.out_bmp("MAP_PATH.bmp");
+    glutPostRedisplay();
+    rrt.optimize_path(&map, 3, 10);
+    render_path(rrt.path, &bmp, 1, 1);
+    bmp.out_bmp("MAP_PATH.bmp");
+    glutPostRedisplay();  // Redraw windows
+
+    //glutTimerFunc(40, timf, 0); // Setup next timer
+}
+
+void process_in_window(int c, char ** v, Map & map) {
+/*
+
+    Bitmap bmp(map.width, map.height);
+    render_map(map, &bmp);
+    bmp.out_bmp("MAP_PATH.bmp");
+
+    RrTree rrt(&map, 3000);
+    //rrt.search(&map, 1, &bmp);
+
+
 
     double temp[2] = {map.points.front().x, map.points.front().y};
     KdTree kd;
@@ -106,6 +130,7 @@ void process_in_window(int c, char ** v, Map & map) {
         map.generate_points(1, map.width, map.height);
         rrt.extend(&map, &kd, true);//, &bmp);
     }
+
 
     for (size_t i = 0; i < rrt.nodes.size(); i++) {
         rrt.go(i);
@@ -122,9 +147,21 @@ void process_in_window(int c, char ** v, Map & map) {
     render_path(rrt.path, &bmp, 1, 1);
     bmp.out_bmp("MAP_PATH.bmp");
 
+*/
+    glutInit(&c, v);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(width, height);
+    glutInitWindowPosition(100, 100);
+    glutCreateWindow(v[0]);
+    init();
+    glutDisplayFunc(display);
+    glutTimerFunc(4, timf, 0); // Set up timer for 40ms, about 25 fps
+    //glutReshapeFunc(reshape);
+    glutMainLoop();
+
+
 
 /*
-
     glutInit(&c, v);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(map.width, map.height);
@@ -142,13 +179,21 @@ int main(int argc, char ** argv) {
 
     srand(time(NULL));
 
-    int width = 1000;
-    int height = 500;
 
-    Map my_map;
-    make_map(width, height, my_map);
 
-    process_in_window(argc, argv, my_map);
+
+
+    //process_in_window(argc, argv, my_map);
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(width, height);
+    glutInitWindowPosition(100, 100);
+    glutCreateWindow(argv[0]);
+    init();
+    glutDisplayFunc(display);
+    glutTimerFunc(4, timf, 0); // Set up timer for 40ms, about 25 fps
+    //glutReshapeFunc(reshape);
+    glutMainLoop();
 
     return 0;
 }
