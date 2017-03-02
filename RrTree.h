@@ -8,15 +8,15 @@
 
 struct RrTree {
     std::vector<RrtNode> nodes;
-    std::vector<Point> path;
-    std::vector<Point> edges;
+    std::vector<Coordinates> path;
+    std::vector<Coordinates> edges;
     RrtNode goal_state;
     double min_distance;
 
     RrTree(Map* the_map, double distance); // 1 = kd
     void search(Map* the_map, bool search, Bitmap * bmp = NULL);
-    bool is_available(Map* the_map, Point point_1, Point point_2);
-    double get_distance(Point point_1, Point point_2);
+    bool is_available(Map* the_map, Coordinates point_1, Coordinates point_2);
+    double get_distance(Coordinates point_1, Coordinates point_2);
     void extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp = NULL);
     void get_path(int index);
     void go(int index);

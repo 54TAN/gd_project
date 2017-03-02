@@ -9,14 +9,16 @@
 #include <cmath>
 #include <ctime>
 
+static GLfloat spin = 0.0;
+
 void make_map(int width, int height, Map & map) {
     map.height = height;
     map.width = width;
-    map.obstacles.push_back(Obstacle(Point(380, 200), Point(390, 500)));
-    map.obstacles.push_back(Obstacle(Point(780, 200), Point(790, 500)));
-    map.obstacles.push_back(Obstacle(Point(580, 0), Point(590, 300)));
-    map.points.push_back(Point(2, 498));
-    map.points.push_back(Point(998, 498));
+    map.obstacles.push_back(Obstacle(Coordinates(380, 200), Coordinates(390, 500)));
+    map.obstacles.push_back(Obstacle(Coordinates(780, 200), Coordinates(790, 500)));
+    map.obstacles.push_back(Obstacle(Coordinates(580, 0), Coordinates(590, 300)));
+    map.points.push_back(Coordinates(2, 498));
+    map.points.push_back(Coordinates(998, 498));
 }
 
 void out_info(RrTree const& rrt, Map const& map, clock_t time = -1) {
@@ -43,13 +45,10 @@ void make_picture(RrTree & rrt, Map const& map) {
     my_bmp.out_bmp("MAP_PATH.bmp");
 }
 
-static GLfloat spin = 0.0;
-
 void init(void) {
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glShadeModel(GL_FLAT);
 }
-
 
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -61,14 +60,12 @@ void display(void) {
     glutSwapBuffers();
 }
 
-
 void spinDisplay(void) {
     spin = spin + 2.0;
     if (spin > 360.0)
         spin = spin - 360.0;
     glutPostRedisplay();
 }
-
 
 void reshape(int w, int h) {
     glViewport(0, 0, (GLsizei) w, (GLsizei) h);
@@ -78,7 +75,6 @@ void reshape(int w, int h) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
-
 
 void mouse(int button, int state, int x, int y) {
     switch (button) {
@@ -95,13 +91,12 @@ void mouse(int button, int state, int x, int y) {
     }
 }
 
-
 void process_in_window(int c, char ** v, Map & map) {
     Bitmap bmp(map.width, map.height);
     render_map(map, &bmp);
     bmp.out_bmp("MAP_PATH.bmp");
 
-    RrTree rrt(&map, 30);
+    RrTree rrt(&map, 300);
     //rrt.search(&map, 1, &bmp);
 
     double temp[2] = {map.points.front().x, map.points.front().y};

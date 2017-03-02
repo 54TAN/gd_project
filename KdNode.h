@@ -1,7 +1,7 @@
 #ifndef GD_PROJECT_KDNODE_H
 #define GD_PROJECT_KDNODE_H
 
-int const N = 2; // сделать нормальные константы
+#include "Consts.h"
 
 struct KdNode {
     double value[N];

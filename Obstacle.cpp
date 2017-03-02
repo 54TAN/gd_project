@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-Obstacle::Obstacle(Point other_min, Point other_max) :
+Obstacle::Obstacle(Coordinates other_min, Coordinates other_max) :
         min_vec(other_min),
         max_vec(other_max)
 {

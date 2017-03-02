@@ -28,7 +28,7 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp)
     static int counter = 0;
     static int current = 0;
 
-    Point new_point = the_map->points.back();
+    Coordinates new_point = the_map->points.back();
     double temp[2] = {new_point.x, new_point.y};
     double best_distance = the_map->width * the_map->height;
     int best_index = -1;
@@ -86,14 +86,14 @@ void RrTree::get_path(int index)
     }
 }
 
-double RrTree::get_distance(Point point_1, Point point_2)
+double RrTree::get_distance(Coordinates point_1, Coordinates point_2)
 {
     return (point_1.x - point_2.x)*(point_1.x - point_2.x) +
            (point_1.y - point_2.y)*(point_1.y - point_2.y);
 
 }
 
-bool RrTree::is_available(Map* the_map, Point point_1, Point point_2)
+bool RrTree::is_available(Map* the_map, Coordinates point_1, Coordinates point_2)
 {
     if (the_map->obstacles.size() == 0) {
         return true;
@@ -114,7 +114,7 @@ bool RrTree::is_available(Map* the_map, Point point_1, Point point_2)
     for (size_t i = 0; i < the_map->width; i++) {
         for (size_t j = 0; j < the_map->height; j++) {
             if (temp_plain[i][j]) {
-                Point pt((double)i, (double)j);
+                Coordinates pt((double)i, (double)j);
                 if (!the_map->is_point_in_obstacle(pt)) {
                     for (size_t k = 0; k < the_map->width; k++) {
                         delete [] temp_plain[k];
@@ -139,7 +139,7 @@ void RrTree::go(int index)
 {
     edges.clear();
     
-    Point temp = nodes[index].point;
+    Coordinates temp = nodes[index].point;
 
     if (nodes[index].children.size() != 0) {
         for (size_t i = 0; i < nodes[index].children.size(); i++) {

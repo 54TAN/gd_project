@@ -13,7 +13,7 @@ include_directories(${OpenGL_INCLUDE_DIRS})
 link_directories(${OpenGL_LIBRARY_DIRS})
 add_definitions(${OpenGL_DEFINITIONS})
 
-set(SOURCE_FILES main.cpp KdNode.cpp KdNode.h KdTree.cpp KdTree.h Map.cpp Map.h Point.cpp Point.h Obstacle.cpp Obstacle.h Bitmap.cpp Bitmap.h RrtNode.cpp RrtNode.h RrTree.cpp RrTree.h Render.cpp Render.h)
+set(SOURCE_FILES main.cpp KdNode.cpp KdNode.h KdTree.cpp KdTree.h Map.cpp Map.h Coordinates.cpp Coordinates.h Obstacle.cpp Obstacle.h Bitmap.cpp Bitmap.h RrtNode.cpp RrtNode.h RrTree.cpp RrTree.h Render.cpp Render.h Consts.h)
 add_executable(gd_project ${SOURCE_FILES})
 
 target_link_libraries(gd_project ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
