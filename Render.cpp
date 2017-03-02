@@ -4,7 +4,8 @@
 #include <cmath>
 
 void bresenham(bool ** temp_plain, Coordinates point_1, Coordinates point_2,
-               bool edge_path, Bitmap * bmp, bool optimized)
+               bool edge_path, Bitmap * bmp, bool optimized, bool for_moving,
+               std::vector <Coordinates>* coords)
 {
 
     int a = point_2.y - point_1.y;
@@ -43,9 +44,13 @@ void bresenham(bool ** temp_plain, Coordinates point_1, Coordinates point_2,
         y += sign_a;
 
         if (bmp != NULL) {
-            if (op) bmp->add_pix(x, y, 1, edge_path, optimized); //додумать
-            else  bmp->add_pix(y, x, 1, edge_path, optimized); //додумать
-
+            if (!for_moving) {
+                if (op) bmp->add_pix(x, y, 1, edge_path, optimized); //додумать
+                else bmp->add_pix(y, x, 1, edge_path, optimized); //додумать
+            } else {
+                if (op) coords->push_back(Coordinates(x, y));
+                else coords->push_back(Coordinates(y, x));
+            }
         } else {
             if (op) temp_plain[x][y] = true;
             else temp_plain[y][x] = true;
@@ -65,7 +70,9 @@ void render_map(Map the_map, Bitmap * bmp)
 
 }
 
-void render_path(std::vector<Coordinates> path, Bitmap * bmp, bool edge_path, bool optimized)
+void render_path(std::vector<Coordinates> path, Bitmap * bmp, bool edge_path, bool optimized,
+                 bool for_moving,
+                 std::vector <Coordinates>* coords)
 {/*
     bool ** temp_plain = new bool * [bmp->width];
     for (size_t i = 0; i < bmp->width; i++) {
@@ -82,7 +89,7 @@ void render_path(std::vector<Coordinates> path, Bitmap * bmp, bool edge_path, bo
         if (path[i].x == -1) {
             continue;
         }
-        bresenham(some, path[i], path[i + 1], edge_path, bmp, optimized);
+        bresenham(some, path[i], path[i + 1], edge_path, bmp, optimized, for_moving, coords);
     }
     //
     /*
