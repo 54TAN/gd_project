@@ -11,7 +11,8 @@ struct Coordinates {
 
     std::vector <double> coords;
 
-    Coordinates(double x_coord, double y_coord, double phi = 90, double length = 90);
+    Coordinates(double x, double y);
+    Coordinates(double x_coord, double y_coord, double phi, double length);
     Coordinates(const Coordinates & other_vec);
     Coordinates& operator=(const Coordinates & other_vec);
     void save(const char * filename);

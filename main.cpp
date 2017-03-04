@@ -19,7 +19,7 @@ void make_map() {
     map.width = width;
     map.obstacles.push_back(Obstacle(Coordinates(95, 0), Coordinates(105, 100)));
     map.points.push_back(Coordinates(2, 2, 90, 60));
-    map.points.push_back(Coordinates(198, 2, 90, 60));
+    map.points.push_back(Coordinates(19, 10, 45, 60));
     render_map(map, &bmp);
     bmp.out_bmp("MAP_PATH.bmp");
 }
@@ -122,16 +122,16 @@ int main(int argc, char ** argv) {
     srand(time(NULL));
 
     make_map();
-/*
 
 
-    bool ** temp_plain = new bool * [width];
+
+    bool ** temp_plane = new bool * [width];
     for (size_t i = 0; i < width; i++) {
-        temp_plain[i] = new bool [height];
+        temp_plane[i] = new bool [height];
     }
     for (size_t i = 0; i < width; i++) {
         for (size_t j = 0; j < height; j++) {
-            temp_plain[i][j] = false;
+            temp_plane[i][j] = false;
         }
     }
 
@@ -147,11 +147,11 @@ int main(int argc, char ** argv) {
               << map.points.back().phi << "\n";
 
 
-    bresenham_obj(temp_plain, map.points.front(), map.points.back());
+    bresenham_obj(temp_plane, map.points.front(), map.points.back());
 
-*/
 
-    RrTree rrt(&map, 500);
+
+    //RrTree rrt(&map, 500);
 
 
 /*
@@ -174,6 +174,7 @@ int main(int argc, char ** argv) {
     std::cout << rrt.is_available(&map, one, two);
 
 */
+/*
 
     rrt.search(&map, 1);
     std::cout << "tree is made\n";
@@ -200,6 +201,7 @@ int main(int argc, char ** argv) {
     glutMouseFunc(mouse);
     glutMainLoop();
 
+*/
 
     return 0;
 

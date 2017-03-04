@@ -39,3 +39,8 @@ void Coordinates::save(const char * filename)
     std::ofstream file(filename, std::ios_base::app);
     file << x << " " << y << std::endl;
 }
+
+Coordinates::Coordinates(double x, double y) :
+        x(x),
+        y(y)
+{}
