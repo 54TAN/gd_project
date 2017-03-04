@@ -10,7 +10,7 @@
 #include <ctime>
 
 static std::vector <Coordinates> go_path;
-static Coordinates MovableObject(2, 60, 90, 60);
+static Coordinates MovableObject(2, 2, 60, 60);
 static Bitmap bmp(width, height);
 static Map map;
 
@@ -18,8 +18,8 @@ void make_map() {
     map.height = height;
     map.width = width;
     map.obstacles.push_back(Obstacle(Coordinates(95, 0), Coordinates(105, 100)));
-    map.points.push_back(Coordinates(2, 60, 90, 60));
-    map.points.push_back(Coordinates(198, 60, 270, 60));
+    map.points.push_back(Coordinates(2, 2, 60, 60));
+    map.points.push_back(Coordinates(130, 2, 60, 60));
     render_map(map, &bmp);
     bmp.out_bmp("MAP_PATH.bmp");
 }
@@ -86,10 +86,10 @@ void move() {
         map.points.clear();
         render_map(map, &bmp);
         MovableObject.x = go_path[i].x;
-        std::cout << go_path[i].x << "\n";
+        //std::cout << go_path[i].x << "\n";
         MovableObject.y = go_path[i].y;
         current_coords.push_back(MovableObject);
-        current_coords.push_back(Coordinates(MovableObject.x, MovableObject.y - MovableObject.length));
+        current_coords.push_back(Coordinates(MovableObject.x, MovableObject.y + MovableObject.length));
         render_path(current_coords, &bmp, 0);
         bmp.out_bmp("MAP_PATH.bmp");
         i++;
@@ -117,15 +117,55 @@ int main(int argc, char ** argv) {
 
     srand(time(NULL));
 
-
     make_map();
+/*
+
+
+    bool ** temp_plain = new bool * [width];
+    for (size_t i = 0; i < width; i++) {
+        temp_plain[i] = new bool [height];
+    }
+    for (size_t i = 0; i < width; i++) {
+        for (size_t j = 0; j < height; j++) {
+            temp_plain[i][j] = false;
+        }
+    }
+
+
+    std::cout << map.points.front().x << " "
+              << map.points.front().y << " "
+            << map.points.front().length << " "
+              << map.points.front().phi << "\n";
+
+    std::cout << map.points.back().x << " "
+              << map.points.back().y << " "
+            << map.points.back().length << " "
+              << map.points.back().phi << "\n";
+
+
+    bresenham_obj(temp_plain, map.points.front(), map.points.back());
+
+*/
 
     RrTree rrt(&map, 500);
+
+
+    /*
+    KdTree kd;
+    kd.nodes.push_back(KdNode(&map.points.front().coords, 0));
+    map.points.push_back(Coordinates(5, 6));
+    //std::cout << rrt.is_available(&map, rrt.nodes.back().point, rrt.goal_state.point);
+    std::cout << rrt.nodes.size() << std::endl;
+    rrt.extend(&map, &kd, 1);
+    std::cout << rrt.nodes.size() << std::endl;
+*/
+
+
     rrt.search(&map, 1);
-    std::cout << "sd";
+    std::cout << "tree is made\n";
     rrt.get_path(rrt.nodes.size() - 1);
-    rrt.optimize_path(&map, 3, 10);
-/*
+    //rrt.optimize_path(&map, 3, 10);
+
 
     render_path(rrt.path, &bmp, 0, 0, true, &go_path);
     std::reverse(go_path.begin(), go_path.end());
@@ -143,6 +183,7 @@ int main(int argc, char ** argv) {
     glutMouseFunc(mouse);
     glutMainLoop();
 
+
     return 0;
-*/
+
 }

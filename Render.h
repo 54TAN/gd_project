@@ -13,7 +13,7 @@ void bresenham(bool ** temp_plain, Coordinates point_1, Coordinates point_2, boo
                Bitmap * bmp = NULL, bool optimized = 0, bool for_moving = false,
                std::vector <Coordinates>* coords = NULL);
 
-void bresenham_obj(bool ** temp_plain, Coordinates point_1, Coordinates point_2);
+void bresenham_obj(bool ** temp_plain, Coordinates const& point_1, Coordinates const& point_2);
 void render_map(Map the_map, Bitmap * bmp);
 void render_path(std::vector<Coordinates> path, Bitmap * bmp, bool edge_path, bool optimized = 0,
                  bool for_moving = false,

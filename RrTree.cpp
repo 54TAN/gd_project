@@ -15,11 +15,19 @@ void RrTree::search(Map* the_map, bool search, Bitmap * bmp) {
     KdTree kd;
     kd.nodes.push_back(KdNode(&the_map->points.front().coords, 0));
     //std::cout << nodes.size() << std::endl;
-    while (!is_available(the_map, nodes.back().point, goal_state.point)) {
-        //std::cout << nodes.size() << std::endl;
+    while (is_available(the_map, nodes.back().point, goal_state.point)) {
+
+
         the_map->generate_points(1, the_map->width, the_map->height, the_map->points[0].length);
-        this->extend(the_map, &kd, search, bmp);
         //std::cout << nodes.size() << std::endl;
+        /*std::cout << nodes.back().point.x << " "
+                  << nodes.back().point.y << " "
+                  << nodes.back().point.phi << "\n";
+        */this->extend(the_map, &kd, search, bmp);
+        /*std::cout << nodes.back().point.x << " "
+                  << nodes.back().point.y << " "
+                  << nodes.back().point.phi << "\n";
+        *///std::cout << nodes.size() << std::endl;
     }/*
     get_path(nodes.size() - 1);
     render_path(path, bmp, 1);
@@ -47,7 +55,7 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp) {
         }
     }
     //std::cout << "Sdsdsdsd" << std::endl;
-    if (!is_available(the_map, new_point, nodes[best_index].point)  &&
+    if (is_available(the_map, new_point, nodes[best_index].point)  &&
         sqrt(best_distance) <= this->min_distance) {
 
         nodes.push_back(RrtNode(new_point, best_index));
@@ -69,7 +77,7 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp) {
         if (counter % 50) {
             if (this->nodes.back().point.x > current) {
                 current = this->nodes.back().point.x;
-                std::cout << current / 10.0 << std::endl;
+                //std::cout << current / 10.0 << std::endl;
             }
         }
 
@@ -96,30 +104,36 @@ double RrTree::get_distance(Coordinates point_1, Coordinates point_2) {
 
 }
 
-bool RrTree::is_available(Map* the_map, Coordinates point_1, Coordinates point_2)
-{
+bool RrTree::is_available(Map* the_map, Coordinates point_1, Coordinates point_2) {
     if (the_map->obstacles.size() == 0) {
         return false;
     }
     //std::cout << "Sdsdsdsd" << std::endl;
-    bool ** temp_plain = new bool * [the_map->width];
-    for (size_t i = 0; i < the_map->width; i++) {
-        temp_plain[i] = new bool [the_map->height];
+    bool ** temp_plain = new bool * [width];
+    for (size_t i = 0; i < width; i++) {
+        temp_plain[i] = new bool [height];
     }
-    for (size_t i = 0; i < the_map->width; i++) {
-        for (size_t j = 0; j < the_map->height; j++) {
+    for (size_t i = 0; i < width; i++) {
+        for (size_t j = 0; j < height; j++) {
             temp_plain[i][j] = false;
         }
     }
 
     bresenham_obj(temp_plain, point_1, point_2);
     //std::cout << "Sdsdsdsd" << std::endl;
-    for (size_t i = 0; i < the_map->width; i++) {
-        for (size_t j = 0; j < the_map->height; j++) {
-            if (temp_plain[i][j]) {
+    //фигура закрашена
+
+
+    for (size_t i = 0; i < width; i++) {
+        for (size_t j = 0; j < height; j++) {
+            if (temp_plain[i][j]) { // если точка единичная, значит она в маршруте
+                // если она в маршруте, значит она не должна быть в препятствии
+                // проверим
+                //сделаем из нее точку
                 Coordinates pt((double)i, (double)j);
-                if (!the_map->is_point_in_obstacle(pt)) {
-                    for (size_t k = 0; k < the_map->width; k++) {
+                //std::cout << "Sdsdsdsd" << std::endl;
+                if (the_map->is_point_in_obstacle(pt)) { // если эта точка в обстакле, то
+                    for (size_t k = 0; k < width; k++) {
                         delete [] temp_plain[k];
                     }
                     delete temp_plain;
@@ -130,7 +144,7 @@ bool RrTree::is_available(Map* the_map, Coordinates point_1, Coordinates point_2
         }
     }
 
-    for (size_t k = 0; k < the_map->width; k++) {
+    for (size_t k = 0; k < width; k++) {
         delete [] temp_plain[k];
     }
     delete temp_plain;

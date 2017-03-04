@@ -12,11 +12,10 @@ Coordinates::Coordinates(double x_coord, double y_coord, double phi, double leng
 {
     coords.push_back(x);
     coords.push_back(y);
-    coords.push_back(phi);
-    coords.push_back(length);
+    //coords.push_back(phi);
 }
 
-Coordinates::Coordinates(const Coordinates &other_vec) :
+Coordinates::Coordinates(Coordinates const& other_vec) :
         x(other_vec.x),
         y(other_vec.y),
         phi(other_vec.phi),
@@ -25,7 +24,7 @@ Coordinates::Coordinates(const Coordinates &other_vec) :
     coords = other_vec.coords;
 }
 
-Coordinates Coordinates::operator=(const Coordinates & other_vec)
+Coordinates& Coordinates::operator=(Coordinates const & other_vec)
 {
     x = other_vec.x;
     y = other_vec.y;

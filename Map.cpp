@@ -18,28 +18,17 @@ void Map::generate_obstacles(int num, int width, int height, double min_diag, do
 */
 
 void Map::generate_points(int num, int width, int height, int len) {
-    if (!obstacles.size()){
-        for (size_t i = 0; i < num; i++) {
-            points.push_back(gen_Point(width, height, 0, 0));
-        }
-    } else {
-        while (num) {
-            Coordinates new_point = gen_Point(width, height, len);
-            if (is_point_in_obstacle(new_point)) {
-                points.push_back(new_point);
-                num--;
-            }
-        }
-    }
+    for (size_t i = 0; i < num; i++)
+        points.push_back(gen_Point(width, height, 0, 0));
 }
 
 Coordinates Map::gen_Point(int width, int height, int len, int min_x, int min_y) {
 
     int x_r = rand() % (width - min_x) + min_x;
     int y_r = rand() % (height - min_y) + min_y;
-    int phi = rand() % 360;
-
-    Coordinates test_point(x_r, y_r, phi);
+    //int phi = rand() % 360;
+    //std::cout << x_r << " " << y_r << "\n";
+    Coordinates test_point(x_r, y_r);//, phi);
 
     if (!is_valid(test_point)) {
         return test_point;
@@ -159,9 +148,6 @@ bool Map::among_points(Coordinates point) {
 
 
 bool Map::is_valid(Coordinates object) {
-    if (obstacles.size() == 0) {
-        return false;
-    }
 
     bool ** temp_plain = new bool * [width];
     for (size_t i = 0; i < width; i++) {
@@ -172,11 +158,17 @@ bool Map::is_valid(Coordinates object) {
             temp_plain[i][j] = false;
         }
     }
+
     double end_x = object.x + object.length * cos(object.phi * M_PI / 180);
     double end_y = object.y + object.length * sin(object.phi * M_PI / 180);
+
+    if (end_x >= width || end_x <= 0 || end_y <= 0 || end_y >= height) {
+        return true;
+    }
+
     Coordinates end(end_x, end_y);
     bresenham(temp_plain, object, end, 0);
-
+    //std::cout << "shit\n";
     for (size_t i = 0; i < width; i++) {
         for (size_t j = 0; j < height; j++) {
 
@@ -184,7 +176,7 @@ bool Map::is_valid(Coordinates object) {
 
 
                 Coordinates pt((double)i, (double)j); // запиливаем
-                if (!is_point_in_obstacle(pt)) { // каждую точку
+                if (is_point_in_obstacle(pt)) { // каждую точку
                     for (size_t k = 0; k < width; k++) {
                         delete [] temp_plain[k];
                     }
