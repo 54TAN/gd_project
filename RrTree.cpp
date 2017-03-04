@@ -24,10 +24,10 @@ void RrTree::search(Map* the_map, bool search, Bitmap * bmp) {
                   << nodes.back().point.y << " "
                   << nodes.back().point.phi << "\n";
         */this->extend(the_map, &kd, search, bmp);
-        /*std::cout << nodes.back().point.x << " "
-                  << nodes.back().point.y << " "
-                  << nodes.back().point.phi << "\n";
-        *///std::cout << nodes.size() << std::endl;
+        //std::cout //<< nodes.back().point.x << " "
+                  //<< nodes.back().point.y << " ";
+                  //<< nodes.back().point.phi << "\n";
+        ///std::cout << nodes.size() << std::endl;
     }/*
     get_path(nodes.size() - 1);
     render_path(path, bmp, 1);
@@ -55,7 +55,7 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp) {
         }
     }
     //std::cout << "Sdsdsdsd" << std::endl;
-    if (is_available(the_map, new_point, nodes[best_index].point)  &&
+    if (!is_available(the_map, new_point, nodes[best_index].point)  &&
         sqrt(best_distance) <= this->min_distance) {
 
         nodes.push_back(RrtNode(new_point, best_index));
@@ -105,9 +105,7 @@ double RrTree::get_distance(Coordinates point_1, Coordinates point_2) {
 }
 
 bool RrTree::is_available(Map* the_map, Coordinates point_1, Coordinates point_2) {
-    if (the_map->obstacles.size() == 0) {
-        return false;
-    }
+
     //std::cout << "Sdsdsdsd" << std::endl;
     bool ** temp_plain = new bool * [width];
     for (size_t i = 0; i < width; i++) {
@@ -136,7 +134,6 @@ bool RrTree::is_available(Map* the_map, Coordinates point_1, Coordinates point_2
                     for (size_t k = 0; k < width; k++) {
                         delete [] temp_plain[k];
                     }
-                    delete temp_plain;
                     //std::cout << "YOU SHELL NOT PAAAAASS!!!" << std::endl;
                     return true;
                 }
@@ -147,7 +144,6 @@ bool RrTree::is_available(Map* the_map, Coordinates point_1, Coordinates point_2
     for (size_t k = 0; k < width; k++) {
         delete [] temp_plain[k];
     }
-    delete temp_plain;
 
     return false;
 }

@@ -18,8 +18,8 @@ void make_map() {
     map.height = height;
     map.width = width;
     map.obstacles.push_back(Obstacle(Coordinates(95, 0), Coordinates(105, 100)));
-    map.points.push_back(Coordinates(2, 2, 60, 60));
-    map.points.push_back(Coordinates(130, 2, 60, 60));
+    map.points.push_back(Coordinates(2, 2, 90, 60));
+    map.points.push_back(Coordinates(198, 2, 90, 60));
     render_map(map, &bmp);
     bmp.out_bmp("MAP_PATH.bmp");
 }
@@ -52,6 +52,7 @@ void display(void) {
     glutSwapBuffers();
     delete data;
 }
+/*
 
 void rrt_in_window() {
     render_map(map, &bmp);
@@ -77,6 +78,7 @@ void rrt_in_window() {
     bmp.out_bmp("MAP_PATH.bmp");
     display();
 }
+*/
 
 void move() {
     static long long i = 0;
@@ -97,12 +99,14 @@ void move() {
     }
 
 }
+/*
 
 void timer(int value) {
     move();
     display();
     glutTimerFunc(5, timer, 0);
 }
+*/
 
 void mouse(int button, int state, int x, int y) {
     switch (button) {
@@ -150,6 +154,10 @@ int main(int argc, char ** argv) {
     RrTree rrt(&map, 500);
 
 
+/*
+    KdTree kd;
+    kd.nodes.push_back(KdNode(&map.points.front().coords, 0));*/
+
     /*
     KdTree kd;
     kd.nodes.push_back(KdNode(&map.points.front().coords, 0));
@@ -159,13 +167,22 @@ int main(int argc, char ** argv) {
     rrt.extend(&map, &kd, 1);
     std::cout << rrt.nodes.size() << std::endl;
 */
+/*
 
+    Coordinates one(2, 2);
+    Coordinates two(198, 2);
+    std::cout << rrt.is_available(&map, one, two);
+
+*/
 
     rrt.search(&map, 1);
     std::cout << "tree is made\n";
     rrt.get_path(rrt.nodes.size() - 1);
     //rrt.optimize_path(&map, 3, 10);
 
+    for (int i = 0; i < rrt.path.size(); i++) {
+        std::cout << rrt.path[i].x << " " << rrt.path[i].y << std::endl;
+    }
 
     render_path(rrt.path, &bmp, 0, 0, true, &go_path);
     std::reverse(go_path.begin(), go_path.end());
