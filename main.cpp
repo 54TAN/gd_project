@@ -18,8 +18,31 @@ void make_map() {
     map.height = height;
     map.width = width;
     map.obstacles.push_back(Obstacle(Coordinates(95, 0), Coordinates(105, 100)));
-    map.points.push_back(Coordinates(2, 2, 90, 60));
-    map.points.push_back(Coordinates(19, 10, 45, 60));
+    /*map.points.push_back(Coordinates(45, 36, 350, 60));
+    map.points.push_back(Coordinates(30, 30, 110, 60));*/
+
+    map.points.push_back(Coordinates(20, 35, 190, 20));
+    map.points.push_back(Coordinates(30, 30, 270, 20));
+
+   /* map.points.push_back(Coordinates(30, 30, 355, 60));
+    map.points.push_back(Coordinates(30, 30, 95, 60));*/
+
+
+    /*map.points.push_back(Coordinates(45, 30, 55, 60));
+    map.points.push_back(Coordinates(30, 36, 110, 60));*/
+    /*map.points.push_back(Coordinates(45, 36, 55, 60));
+    map.points.push_back(Coordinates(30, 30, 110, 60));*/
+
+
+    /*map.points.push_back(Coordinates(35, 20, 55, 60));
+    map.points.push_back(Coordinates(20, 26, 80, 60));*/
+    /*map.points.push_back(Coordinates(35, 26, 55, 60));
+    map.points.push_back(Coordinates(20, 20, 80, 60));*/
+
+    /*map.points.push_back(Coordinates(35, 20, 120, 60));
+    map.points.push_back(Coordinates(20, 26, 80, 60));*/
+    /*map.points.push_back(Coordinates(35, 26, 120, 60));
+    map.points.push_back(Coordinates(20, 20, 80, 60));*/
     render_map(map, &bmp);
     bmp.out_bmp("MAP_PATH.bmp");
 }

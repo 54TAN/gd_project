@@ -62,8 +62,7 @@ void bresenham(bool ** temp_plane, Coordinates point_1, Coordinates point_2,
     std::cout << std::endl;
 }
 
-void render_map(Map the_map, Bitmap * bmp)
-{
+void render_map(Map the_map, Bitmap * bmp) {
     for (int i = 0; i < bmp->width; i++) {
         for (int j = 0; j < bmp->height; j++) {
             Coordinates pt((double)i, (double)j);
@@ -89,7 +88,8 @@ void render_path(std::vector<Coordinates> path, Bitmap * bmp, bool edge_path, bo
 
 void bresenham_circle(bool ** temp_plane, Coordinates point,
                       int bound_x_up, int bound_y_up,
-                      int bound_x_down, int bound_y_down) {
+                      int bound_x_down, int bound_y_down)
+{
 
     int x = point.x;
     int y = point.y;
@@ -158,62 +158,136 @@ void bresenham_circle(bool ** temp_plane, Coordinates point,
 
 void bresenham_obj(bool **temp_plane, Coordinates object_1, Coordinates object_2) {
 
-    int end_object_1_x = object_1.x + object_1.length * cos(object_1.phi * M_PI / 180);
-    int end_object_1_y = object_1.y + object_1.length * sin(object_1.phi * M_PI / 180);
-    Coordinates end_1(end_object_1_x, end_object_1_y);
+    if (object_1.x != object_2.x && object_1.y != object_2.y) {
+        Coordinates left = (object_1.x > object_2.x) ? object_2 : object_1;
+        Coordinates right = (object_1.x < object_2.x) ? object_2 : object_1;
+        Coordinates up = (object_1.y > object_2.y) ? object_2 : object_1;
+        Coordinates down = (object_1.y < object_2.y) ? object_2 : object_1;
 
-    int end_object_2_x = object_2.x + object_2.length * cos(object_2.phi * M_PI / 180);
-    int end_object_2_y = object_2.y + object_2.length * sin(object_2.phi * M_PI / 180);
-    Coordinates end_2(end_object_2_x, end_object_2_y);
+        int end_left_x = (left.x + left.length * cos(left.phi * M_PI / 180));
+        int end_left_y = left.y + left.length * sin(left.phi * M_PI / 180);
+        Coordinates end_left(end_left_x, end_left_y);
 
-    bresenham(temp_plane, object_1, end_1, 0);
+        //int phi = (right.phi > 90) ? 180 - right.phi : right.phi;
 
-    bresenham(temp_plane, object_2, end_2, 0);
+        int end_right_x = right.x + right.length * cos(right.phi * M_PI / 180);
+        int end_right_y = right.y + right.length * sin(right.phi * M_PI / 180);
+        Coordinates end_right(end_right_x, end_right_y);
 
-    bresenham(temp_plane, object_1, object_2, 0);
+        bresenham(temp_plane, left, end_left, 0);
+        bresenham(temp_plane, right, end_right, 0);
+        if (left.x != right.x && right.y != left.y)
+            bresenham(temp_plane, left, right, 0);
 
-    bresenham(temp_plane, end_1, Coordinates(object_2.x,
-                                             end_object_1_y + object_2.y - object_1.y), 0);
+        if (left.phi != right.phi && (left.x != right.x && right.y != left.y)) {
 
+            if (right.phi < left.phi && end_left_x < end_right_x) {
+                int diff_x = (left.phi < 90) ? abs(end_left_x - left.x) : -1*abs(end_left_x - left.x);
+                std::cout << "one";
+                if (right.y < left.y) {
+                    bresenham(temp_plane, end_left, Coordinates(right.x + right.length * cos(left.phi * M_PI / 180),
+                                                                end_left_y - (left.y - right.y)), 0);
+                } else {
+                    bresenham(temp_plane, end_left, Coordinates(right.x + diff_x, end_left_y + abs(right.y - left.y)), 0);
+                }
+                Coordinates center(right.x, right.y, 0, object_1.length);
 
-    int initial_x = std::min(object_1.x, object_2.x);
-    //std::cout << initial_x << "\n";
-    int final_x = std::max(object_1.x, object_2.x);
-    //std::cout << final_x << "\n";
-    int initial_y = std::min(object_1.x, object_2.x);
-    int final_y = std::min(object_1.x, object_2.x);
+                int bound_x_up = end_right_x - 1;
+                int bound_y_up = height;
+                int bound_x_down = right.x + diff_x;
+                int bound_y_down = std::min((int)left.y, (int)right.y);
 
-    Coordinates center(object_2.x, object_2.y, 0, object_1.length);
-
-    int bound_x_up = std::max(end_object_2_x, (int)object_1.x);
-    int bound_y_up = std::max(end_object_1_y + (int)object_2.y, (int)object_2.y);
-    int bound_x_down = std::min((int)object_1.x, (int)object_2.x);
-    int bound_y_down = std::min((int)object_1.y, (int)object_2.y);
-
-    bresenham_circle(temp_plane, center, bound_x_up, bound_y_up, bound_x_down, bound_y_down);
-
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; ++j) {
-
-            if (i >= final_x && i <= initial_x) {
-                temp_plane[i][j] = false;
+                bresenham_circle(temp_plane, center, bound_x_up, bound_y_up, bound_x_down, bound_y_down);
             }
 
-            if (temp_plane[i][j]) {
-                int tmp = j + 1;
-                while (!temp_plane[i][tmp] && tmp < height) {
-                    temp_plane[i][tmp] = true;
-                    tmp++;
+            /*if (right.phi < 90 && right.phi < left.phi && end_left_x > right.x)
+                bresenham(temp_plane, end_left, Coordinates(right.x + right.length * cos(left.phi * M_PI / 180),
+                                                            right.y + right.length * sin(left.phi * M_PI / 180)), 0);*/
+
+            if (right.phi > left.phi && end_left_x > end_right_x) {
+                bresenham(temp_plane, right, Coordinates(right.x + right.length * cos(left.phi * M_PI / 180),
+                                                         right.y + right.length * sin(left.phi * M_PI / 180)), 0);
+                std::cout << "two";
+                if (right.y < left.y) {
+                    bresenham(temp_plane, end_left, Coordinates(right.x + right.length * cos(left.phi * M_PI / 180),
+                                                                end_left_y - (left.y - right.y)), 0);
                 }
 
-                for (int k = tmp + 1; k < height; k++) {
-                    temp_plane[i][k] = false;
-                }
+                Coordinates center(right.x, right.y, 0, object_1.length);
 
-                break;
+                int bound_x_up = right.x + right.length * cos(left.phi * M_PI / 180) - 1;
+                int bound_y_up = std::max((int)(right.y + right.length * sin(left.phi * M_PI / 180)), end_right_y) + 1;
+                int bound_x_down = end_right_x;
+                int bound_y_down = std::min(end_right_y, (int)(right.y + right.length * sin(left.phi * M_PI / 180)));
+
+                bresenham_circle(temp_plane, center, bound_x_up, bound_y_up, bound_x_down, bound_y_down);
+
             }
+
+            /*if (right.phi < left.phi && left.phi <= 90) {
+                std::cout << "three";
+
+                if (right.y < left.y) {
+                    bresenham(temp_plane, end_left, Coordinates(right.x + right.length * cos(left.phi * M_PI / 180),
+                                                                end_left_y - (left.y - right.y)), 0);
+                }
+
+                Coordinates center(right.x, right.y, 0, object_1.length);
+
+                int bound_x_up = end_right_x - 1;
+                int bound_y_up = (int)(right.y + right.length * sin(left.phi * M_PI / 180)) + 1;
+                int bound_x_down = end_left_x;
+                int bound_y_down = std::min((int)left.y, (int)right.y);
+
+                bresenham_circle(temp_plane, center, bound_x_up, bound_y_up, bound_x_down, bound_y_down);
+            }*/
+
+        } else {
+            if (left.x != right.x && right.y != left.y)
+                bresenham(temp_plane, end_left, end_right, 0);
+
         }
+    }else {
+        Coordinates left = (object_1.phi < object_2.phi) ? object_2 : object_1;
+        Coordinates right = (object_1.phi > object_2.phi) ? object_2 : object_1;
+        //std::cout << (left.phi == right.phi);
+        int end_left_x = (left.x + left.length * cos(left.phi * M_PI / 180));
+        int end_left_y = left.y + left.length * sin(left.phi * M_PI / 180);
+        int end_right_x = right.x + right.length * cos(right.phi * M_PI / 180);
+        int end_right_y = right.y + right.length * sin(right.phi * M_PI / 180);
+
+        Coordinates end_left(end_left_x, end_left_y);
+        Coordinates end_right(end_right_x, end_right_y);
+
+        bresenham(temp_plane, left, end_left, 0);
+        bresenham(temp_plane, right, end_right, 0);
+        bresenham_circle(temp_plane, object_1, width, height, 0, 0);
     }
+
+
+
+   /* for (int i = 0; i < width; i++) {
+         for (int j = 0; j < height; ++j) {
+             if (!temp_plane[i][j]) {
+                 bool one_side = false;
+                 bool other_side = false;
+                 for (int k = 0; k < j; k++) {
+                     if (temp_plane[i][k]) {
+                         one_side = true;
+                     }
+                 }
+                 for (int k = j + 1; k < height; k++) {
+                     if (temp_plane[i][k]) {
+                         other_side = true;
+                     }
+                 }
+                 if (one_side && other_side)
+                     temp_plane[i][j] = true;
+             }
+         }
+     }*/
+
+
 
 
     {
