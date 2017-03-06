@@ -10,7 +10,7 @@
 #include <ctime>
 
 static std::vector <Coordinates> go_path;
-static Coordinates MovableObject(2, 2, 90, 60);
+static Coordinates MovableObject(2, 2, 90, 40);
 static Bitmap bmp(width, height);
 static Map map;
 
