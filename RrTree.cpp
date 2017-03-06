@@ -15,7 +15,7 @@ void RrTree::search(Map* the_map, bool search, Bitmap * bmp) {
     KdTree kd;
     kd.nodes.push_back(KdNode(&the_map->points.front().coords, 0));
     //std::cout << nodes.size() << std::endl;
-    while (is_available(the_map, nodes.back().point, goal_state.point)) {
+    while (is_available_second(the_map, nodes.back().point, goal_state.point)) {
 
 
         the_map->generate_points(1, the_map->width, the_map->height, the_map->points[0].length);
@@ -55,7 +55,7 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp) {
         }
     }
     //std::cout << "Sdsdsdsd" << std::endl;
-    if (!is_available(the_map, new_point, nodes[best_index].point)  &&
+    if (!is_available_second(the_map, new_point, nodes[best_index].point)  &&
         sqrt(best_distance) <= this->min_distance) {
 
         nodes.push_back(RrtNode(new_point, best_index));
@@ -170,6 +170,131 @@ void RrTree::optimize_path(Map * map, int step, int iter) {
         }
         iter--;
     }
+}
+
+static
+void get_equation(double * coefs, Coordinates one, Coordinates two) {
+    coefs[0] = two.y - one.y;
+    if (coefs[0] == 0) {
+        coefs[1] = 1;
+        coefs[2] = -1*two.y;
+        return;
+    }
+    coefs[1] = two.x - one.x;
+    if (coefs[1] == 0) {
+        coefs[0] = 1;
+        coefs[2] = -1*two.x;
+        return;
+    }
+    coefs[2] = (-1 * one.x) * coefs[0] + one.y * coefs[1];
+    coefs[1] *= -1;
+}
+
+static
+bool get_intersection(double * firstLineCoefs, double * secondLineCoefs, double * x) {
+
+    double det = firstLineCoefs[0] * secondLineCoefs[1] - firstLineCoefs[1] * secondLineCoefs[0];
+    double det_1 = -1*firstLineCoefs[2] * secondLineCoefs[1] - firstLineCoefs[1] * -1*secondLineCoefs[2];
+    double det_2 = firstLineCoefs[0] * -1*secondLineCoefs[2] - -1*firstLineCoefs[2] * secondLineCoefs[0];
+
+    if (det) {
+        *x = det_1/det;
+        return true;
+    } else {
+
+        if (!det_1 && !det_2) {
+            *x = -1*secondLineCoefs[2];
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+}
+
+bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates object_2) {
+
+    std::vector <std::pair<Coordinates, Coordinates>> ribs;
+    std::vector <double*> equations;
+
+    Coordinates left = (object_1.x > object_2.x) ? object_2 : object_1;
+    Coordinates right = (object_1.x < object_2.x) ? object_2 : object_1;
+
+    int end_left_x = left.x + left.length * cos(left.phi * M_PI / 180);
+    int end_left_y = left.y + left.length * sin(left.phi * M_PI / 180);
+    Coordinates end_left(end_left_x, end_left_y);
+
+    int end_right_x = right.x + right.length * cos(right.phi * M_PI / 180);
+    int end_right_y = right.y + right.length * sin(right.phi * M_PI / 180);
+    Coordinates end_right(end_right_x, end_right_y);
+
+
+    ribs.push_back(std::make_pair(left, end_left));
+    if (left.y != right.y) ribs.push_back(std::make_pair(left, right));
+    ribs.push_back(std::make_pair(right, end_right));
+    if (left.y != right.y) ribs.push_back(std::make_pair(end_left, end_right));
+
+
+    for (int i = 0; i < ribs.size(); i++) {
+        equations.push_back(new double [3]);
+        get_equation(equations[i], ribs[i].first, ribs[i].second);
+    }
+
+    int lower_bound_y = std::min(left.y, right.y);
+    int higher_bound_y = std::max(end_left_y, end_right_y);
+    int lower_bound_x = left.x;
+    int higher_bound_x = right.x;
+
+
+    for (int i = lower_bound_y; i < higher_bound_y; i++) { //по высоте
+
+        double line[3] = {0, 1, (double) (-1 * (i))};
+
+        double x = -1;
+        std::vector<double> x_intersect;
+
+        for (auto item : equations) {
+            if (get_intersection(line, item, &x)) {
+                if (x >= lower_bound_x && x <= higher_bound_x)
+                    x_intersect.push_back(x);
+            }
+        }
+
+        if (x_intersect.size() >= 2) {
+            std::cout << x_intersect.size() << std::endl;
+
+            int first_index;
+            int second_index;
+
+            if (x_intersect.size() == 3) {
+                if (i < std::min(end_left_y, end_right_y)) {
+                    first_index = 0;
+                    second_index = 1;
+                } else {
+                    first_index = 1;
+                    second_index = 2;
+                }
+            } else {
+                first_index = (x_intersect.size() == 2) ? 0 : 1;
+                second_index = (x_intersect.size() == 2) ? 1 : 2;
+            }
+
+            std::cout << first_index << " : " << second_index << "\n";
+
+            for (int j = lower_bound_x; j < higher_bound_x; j++) {
+                if ((x_intersect[first_index] <= j && j <= x_intersect[second_index]) ||
+                    (x_intersect[first_index] >= j && j >= x_intersect[second_index])) {
+                    Coordinates pt((double)j, (double)i);
+                    if (the_map->is_point_in_obstacle(pt)) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
+
 }
 
 

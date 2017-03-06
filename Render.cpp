@@ -4,10 +4,9 @@
 #include <cmath>
 #include <fstream>
 
-void bresenham(bool ** temp_plane, Coordinates point_1, Coordinates point_2,
-               bool edge_path, Bitmap * bmp, bool optimized, bool for_moving,
-               std::vector <Coordinates>* coords)
-{
+void bresenham(bool **temp_plane, Coordinates point_1, Coordinates point_2,
+               bool edge_path, Bitmap *bmp, bool optimized, bool for_moving,
+               std::vector<Coordinates> *coords) {
 
     int a = point_2.y - point_1.y;
     int b = point_1.x - point_2.x;
@@ -17,11 +16,11 @@ void bresenham(bool ** temp_plane, Coordinates point_1, Coordinates point_2,
     int sign_b = (b < 0) ? -1 : 1;
 
     int f = 0;
-    int x = (int)point_1.x;
-    int y = (int)point_1.y; // текущие координаты
+    int x = (int) point_1.x;
+    int y = (int) point_1.y; // текущие координаты
     //std::cout << y << std::endl;
-    int dy = a*sign_a;
-    int dx = b*sign_b;
+    int dy = a * sign_a;
+    int dx = b * sign_b;
     int fin_x = point_2.x;
     int fin_y = point_2.y; // финальные координаты
     if (bmp != NULL) bmp->add_pix(x, y, 1, edge_path);
@@ -62,10 +61,10 @@ void bresenham(bool ** temp_plane, Coordinates point_1, Coordinates point_2,
     std::cout << std::endl;
 }
 
-void render_map(Map the_map, Bitmap * bmp) {
+void render_map(Map the_map, Bitmap *bmp) {
     for (int i = 0; i < bmp->width; i++) {
         for (int j = 0; j < bmp->height; j++) {
-            Coordinates pt((double)i, (double)j);
+            Coordinates pt((double) i, (double) j);
             bool flag = the_map.is_point_in_obstacle(pt) || the_map.among_points(pt);
             bmp->add_pix(i, j, flag, 0);
         }
@@ -73,11 +72,10 @@ void render_map(Map the_map, Bitmap * bmp) {
 
 }
 
-void render_path(std::vector<Coordinates> path, Bitmap * bmp, bool edge_path, bool optimized,
+void render_path(std::vector<Coordinates> path, Bitmap *bmp, bool edge_path, bool optimized,
                  bool for_moving,
-                 std::vector <Coordinates>* coords)
-{
-    bool ** some;
+                 std::vector<Coordinates> * coords) {
+    bool **some;
     for (size_t i = 0; i < path.size() - 1; i++) {
         if (path[i].x == -1) {
             continue;
@@ -86,10 +84,9 @@ void render_path(std::vector<Coordinates> path, Bitmap * bmp, bool edge_path, bo
     }
 }
 
-void bresenham_circle(bool ** temp_plane, Coordinates point,
+void bresenham_circle(bool **temp_plane, Coordinates point,
                       int bound_x_up, int bound_y_up,
-                      int bound_x_down, int bound_y_down)
-{
+                      int bound_x_down, int bound_y_down) {
 
     int x = point.x;
     int y = point.y;
@@ -158,7 +155,7 @@ void bresenham_circle(bool ** temp_plane, Coordinates point,
 
 void bresenham_obj(bool **temp_plane, Coordinates object_1, Coordinates object_2) {
 
-    if (object_1.x != object_2.x && object_1.y != object_2.y) {
+    if (object_1.x != object_2.x || object_1.y != object_2.y) {
         Coordinates left = (object_1.x > object_2.x) ? object_2 : object_1;
         Coordinates right = (object_1.x < object_2.x) ? object_2 : object_1;
         Coordinates up = (object_1.y > object_2.y) ? object_2 : object_1;
@@ -176,26 +173,26 @@ void bresenham_obj(bool **temp_plane, Coordinates object_1, Coordinates object_2
 
         bresenham(temp_plane, left, end_left, 0);
         bresenham(temp_plane, right, end_right, 0);
-        if (left.x != right.x && right.y != left.y)
-            bresenham(temp_plane, left, right, 0);
+        bresenham(temp_plane, left, right, 0);
 
         if (left.phi != right.phi && (left.x != right.x && right.y != left.y)) {
 
             if (right.phi < left.phi && end_left_x < end_right_x) {
-                int diff_x = (left.phi < 90) ? abs(end_left_x - left.x) : -1*abs(end_left_x - left.x);
+                int diff_x = (left.phi < 90) ? abs(end_left_x - left.x) : -1 * abs(end_left_x - left.x);
                 std::cout << "one";
                 if (right.y < left.y) {
                     bresenham(temp_plane, end_left, Coordinates(right.x + right.length * cos(left.phi * M_PI / 180),
                                                                 end_left_y - (left.y - right.y)), 0);
                 } else {
-                    bresenham(temp_plane, end_left, Coordinates(right.x + diff_x, end_left_y + abs(right.y - left.y)), 0);
+                    bresenham(temp_plane, end_left, Coordinates(right.x + diff_x, end_left_y + abs(right.y - left.y)),
+                              0);
                 }
                 Coordinates center(right.x, right.y, 0, object_1.length);
 
                 int bound_x_up = end_right_x - 1;
                 int bound_y_up = height;
                 int bound_x_down = right.x + diff_x;
-                int bound_y_down = std::min((int)left.y, (int)right.y);
+                int bound_y_down = std::min((int) left.y, (int) right.y);
 
                 bresenham_circle(temp_plane, center, bound_x_up, bound_y_up, bound_x_down, bound_y_down);
             }
@@ -216,9 +213,9 @@ void bresenham_obj(bool **temp_plane, Coordinates object_1, Coordinates object_2
                 Coordinates center(right.x, right.y, 0, object_1.length);
 
                 int bound_x_up = right.x + right.length * cos(left.phi * M_PI / 180) - 1;
-                int bound_y_up = std::max((int)(right.y + right.length * sin(left.phi * M_PI / 180)), end_right_y) + 1;
+                int bound_y_up = std::max((int) (right.y + right.length * sin(left.phi * M_PI / 180)), end_right_y) + 1;
                 int bound_x_down = end_right_x;
-                int bound_y_down = std::min(end_right_y, (int)(right.y + right.length * sin(left.phi * M_PI / 180)));
+                int bound_y_down = std::min(end_right_y, (int) (right.y + right.length * sin(left.phi * M_PI / 180)));
 
                 bresenham_circle(temp_plane, center, bound_x_up, bound_y_up, bound_x_down, bound_y_down);
 
@@ -247,27 +244,31 @@ void bresenham_obj(bool **temp_plane, Coordinates object_1, Coordinates object_2
                 bresenham(temp_plane, end_left, end_right, 0);
 
         }
-    }else {
-
-
+    } else {
 
         if (object_1.phi != object_2.phi) {
-            Coordinates left = (object_1.phi < object_2.phi) ? object_2 : object_1;
-            Coordinates right = (object_1.phi > object_2.phi) ? object_2 : object_1;
-            //std::cout << (left.phi == right.phi);
-            int end_left_x = (left.x + left.length * cos(left.phi * M_PI / 180));
-            int end_left_y = left.y + left.length * sin(left.phi * M_PI / 180);
-            int end_right_x = right.x + right.length * cos(right.phi * M_PI / 180);
-            int end_right_y = right.y + right.length * sin(right.phi * M_PI / 180);
+            if (object_1.x == object_2.x && object_1.y == object_2.y) {
+                Coordinates left = (object_1.phi < object_2.phi) ? object_2 : object_1;
+                Coordinates right = (object_1.phi > object_2.phi) ? object_2 : object_1;
+                //std::cout << (left.phi == right.phi);
+                int end_left_x = (left.x + left.length * cos(left.phi * M_PI / 180));
+                int end_left_y = left.y + left.length * sin(left.phi * M_PI / 180);
+                int end_right_x = right.x + right.length * cos(right.phi * M_PI / 180);
+                int end_right_y = right.y + right.length * sin(right.phi * M_PI / 180);
 
-            Coordinates end_left(end_left_x, end_left_y);
-            Coordinates end_right(end_right_x, end_right_y);
+                Coordinates end_left(end_left_x, end_left_y);
+                Coordinates end_right(end_right_x, end_right_y);
 
-            bresenham(temp_plane, left, end_left, 0);
-            bresenham(temp_plane, right, end_right, 0);
-            bresenham_circle(temp_plane, object_1, width, height, 0, 0);
+                bresenham(temp_plane, left, end_left, 0);
+                bresenham(temp_plane, right, end_right, 0);
+                bresenham_circle(temp_plane, object_1, width, height, 0, 0);
+            } else {
+                std::cout << "here\n";
+
+            }
+
         } else {
-            std::cout<< "here";
+
             Coordinates left = (object_1.x > object_2.x) ? object_2 : object_1;
             Coordinates right = (object_1.x < object_2.x) ? object_2 : object_1;
             Coordinates up = (object_1.y > object_2.y) ? object_2 : object_1;
@@ -288,45 +289,39 @@ void bresenham_obj(bool **temp_plane, Coordinates object_1, Coordinates object_2
             bresenham(temp_plane, left, right, 0);
             bresenham(temp_plane, end_left, end_right, 0);
 
-            {
-                std::ofstream file("temp_plane.txt");
-                for (int i = 0; i < width; ++i) {
-                    for (int j = 0; j < height; ++j) {
-                        file << temp_plane[i][j] << " ";
+        }
+    }
+
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; ++j) {
+            if (!temp_plane[i][j]) {
+                bool one_side = false;
+                bool other_side = false;
+                for (int k = 0; k < j; k++) {
+                    if (temp_plane[i][k]) {
+                        one_side = true;
                     }
-                    file << "\n";
                 }
+                for (int k = j + 1; k < height; k++) {
+                    if (temp_plane[i][k]) {
+                        other_side = true;
+                    }
+                }
+                if (one_side && other_side)
+                    temp_plane[i][j] = true;
             }
         }
     }
 
-
-
-   for (int i = 0; i < width; i++) {
-         for (int j = 0; j < height; ++j) {
-             if (!temp_plane[i][j]) {
-                 bool one_side = false;
-                 bool other_side = false;
-                 for (int k = 0; k < j; k++) {
-                     if (temp_plane[i][k]) {
-                         one_side = true;
-                     }
-                 }
-                 for (int k = j + 1; k < height; k++) {
-                     if (temp_plane[i][k]) {
-                         other_side = true;
-                     }
-                 }
-                 if (one_side && other_side)
-                     temp_plane[i][j] = true;
-             }
-         }
-     }
-
-
-
-
-
+    {
+        std::ofstream file("temp_plane.txt");
+        for (int i = 0; i < width; ++i) {
+            for (int j = 0; j < height; ++j) {
+                file << temp_plane[i][j] << " ";
+            }
+            file << "\n";
+        }
+    }
 
 
 }

@@ -26,7 +26,7 @@ Coordinates Map::gen_Point(int width, int height, int len, int min_x, int min_y)
 
     int x_r = rand() % (width - min_x) + min_x;
     int y_r = rand() % (height - min_y) + min_y;
-    //int phi = rand() % 360;
+    int phi = rand() % 90;
     //std::cout << x_r << " " << y_r << "\n";
     Coordinates test_point(x_r, y_r, 90, len);//, phi);
 

@@ -19,7 +19,7 @@ void bresenham_circle(bool ** temp_plane, Coordinates point_1, int bound_x_up, i
 void render_map(Map the_map, Bitmap * bmp);
 void render_path(std::vector<Coordinates> path, Bitmap * bmp, bool edge_path, bool optimized = 0,
                  bool for_moving = false,
-                 std::vector <Coordinates>* coords = NULL);
+                 std::vector <Coordinates> * coords = NULL);
 
 
 #endif //GD_PROJECT_RENDER_H

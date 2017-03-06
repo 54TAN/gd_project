@@ -10,7 +10,7 @@
 #include <ctime>
 
 static std::vector <Coordinates> go_path;
-static Coordinates MovableObject(2, 2, 60, 60);
+static Coordinates MovableObject(2, 2, 90, 60);
 static Bitmap bmp(width, height);
 static Map map;
 
@@ -21,8 +21,8 @@ void make_map() {
     /*map.points.push_back(Coordinates(45, 36, 350, 60));
     map.points.push_back(Coordinates(30, 30, 110, 60));*/
 
-    map.points.push_back(Coordinates(2, 2, 90, 60));
-    map.points.push_back(Coordinates(198, 2, 90, 60));
+    map.points.push_back(Coordinates(2, 2, 90, 40));
+    map.points.push_back(Coordinates(198, 2, 90, 40));
 
     /*map.points.push_back(Coordinates(20, 35, 190, 20));
     map.points.push_back(Coordinates(30, 30, 270, 20));*/
@@ -116,10 +116,16 @@ void move() {
         MovableObject.x = go_path[i].x;
         //std::cout << go_path[i].x << "\n";
         MovableObject.y = go_path[i].y;
+
+        int end_MovableObject_x = (MovableObject.x + MovableObject.length * cos(MovableObject.phi * M_PI / 180));
+        int end_MovableObject_y = MovableObject.y + MovableObject.length * sin(MovableObject.phi * M_PI / 180);
+
         current_coords.push_back(MovableObject);
-        current_coords.push_back(Coordinates(MovableObject.x, MovableObject.y + MovableObject.length));
+        current_coords.push_back(Coordinates(end_MovableObject_x, end_MovableObject_y));
+
         render_path(current_coords, &bmp, 0);
         bmp.out_bmp("MAP_PATH.bmp");
+
         i++;
         glutPostRedisplay();
     }
@@ -200,12 +206,12 @@ int main(int argc, char ** argv) {
 
 
     rrt.search(&map, 1);
-    std::cout << "tree is made\n";
     rrt.get_path(rrt.nodes.size() - 1);
     //rrt.optimize_path(&map, 3, 10);
+    std::reverse(go_path.begin(), go_path.end());
 
     /*for (int i = 0; i < rrt.path.size(); i++) {
-        std::cout << rrt.path[i].x << " " << rrt.path[i].y << std::endl;
+        std::cout << rrt.path[i].x << " " << rrt.path[i].y << " " << rrt.path[i].phi << std::endl;
     }*/
 
     render_path(rrt.path, &bmp, 0, 0, true, &go_path);
