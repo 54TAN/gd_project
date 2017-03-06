@@ -210,6 +210,7 @@ int main(int argc, char ** argv) {
     //rrt.optimize_path(&map, 3, 10);
     std::reverse(go_path.begin(), go_path.end());
 
+
     /*for (int i = 0; i < rrt.path.size(); i++) {
         std::cout << rrt.path[i].x << " " << rrt.path[i].y << " " << rrt.path[i].phi << std::endl;
     }*/
