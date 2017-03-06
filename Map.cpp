@@ -19,7 +19,7 @@ void Map::generate_obstacles(int num, int width, int height, double min_diag, do
 
 void Map::generate_points(int num, int width, int height, int len) {
     for (size_t i = 0; i < num; i++)
-        points.push_back(gen_Point(width, height, 0, 0));
+        points.push_back(gen_Point(width, height, len, 0));
 }
 
 Coordinates Map::gen_Point(int width, int height, int len, int min_x, int min_y) {
@@ -28,12 +28,12 @@ Coordinates Map::gen_Point(int width, int height, int len, int min_x, int min_y)
     int y_r = rand() % (height - min_y) + min_y;
     //int phi = rand() % 360;
     //std::cout << x_r << " " << y_r << "\n";
-    Coordinates test_point(x_r, y_r);//, phi);
+    Coordinates test_point(x_r, y_r, 90, len);//, phi);
 
     if (!is_valid(test_point)) {
         return test_point;
     } else {
-        return gen_Point(width, height, min_x, min_y, len);
+        return gen_Point(width, height, len, min_x, min_y);
     }
 
 }

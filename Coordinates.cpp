@@ -43,4 +43,7 @@ void Coordinates::save(const char * filename)
 Coordinates::Coordinates(double x, double y) :
         x(x),
         y(y)
-{}
+{
+    phi = 0;
+    length = 0;
+}

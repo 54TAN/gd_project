@@ -21,8 +21,11 @@ void make_map() {
     /*map.points.push_back(Coordinates(45, 36, 350, 60));
     map.points.push_back(Coordinates(30, 30, 110, 60));*/
 
-    map.points.push_back(Coordinates(20, 35, 190, 20));
-    map.points.push_back(Coordinates(30, 30, 270, 20));
+    map.points.push_back(Coordinates(2, 2, 90, 60));
+    map.points.push_back(Coordinates(198, 2, 90, 60));
+
+    /*map.points.push_back(Coordinates(20, 35, 190, 20));
+    map.points.push_back(Coordinates(30, 30, 270, 20));*/
 
    /* map.points.push_back(Coordinates(30, 30, 355, 60));
     map.points.push_back(Coordinates(30, 30, 95, 60));*/
@@ -146,8 +149,7 @@ int main(int argc, char ** argv) {
 
     make_map();
 
-
-
+/*
     bool ** temp_plane = new bool * [width];
     for (size_t i = 0; i < width; i++) {
         temp_plane[i] = new bool [height];
@@ -170,12 +172,11 @@ int main(int argc, char ** argv) {
               << map.points.back().phi << "\n";
 
 
-    bresenham_obj(temp_plane, map.points.front(), map.points.back());
+    bresenham_obj(temp_plane, map.points.front(), map.points.back());*/
 
 
 
-    //RrTree rrt(&map, 500);
-
+    RrTree rrt(&map, 500);
 
 /*
     KdTree kd;
@@ -190,23 +191,22 @@ int main(int argc, char ** argv) {
     rrt.extend(&map, &kd, 1);
     std::cout << rrt.nodes.size() << std::endl;
 */
-/*
 
+/*
     Coordinates one(2, 2);
     Coordinates two(198, 2);
-    std::cout << rrt.is_available(&map, one, two);
+    std::cout << rrt.is_available(&map, one, two);*/
 
-*/
-/*
+
 
     rrt.search(&map, 1);
     std::cout << "tree is made\n";
     rrt.get_path(rrt.nodes.size() - 1);
     //rrt.optimize_path(&map, 3, 10);
 
-    for (int i = 0; i < rrt.path.size(); i++) {
+    /*for (int i = 0; i < rrt.path.size(); i++) {
         std::cout << rrt.path[i].x << " " << rrt.path[i].y << std::endl;
-    }
+    }*/
 
     render_path(rrt.path, &bmp, 0, 0, true, &go_path);
     std::reverse(go_path.begin(), go_path.end());
@@ -224,7 +224,6 @@ int main(int argc, char ** argv) {
     glutMouseFunc(mouse);
     glutMainLoop();
 
-*/
 
     return 0;
 
