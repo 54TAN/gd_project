@@ -16,6 +16,7 @@ struct Coordinates {
     Coordinates(const Coordinates & other_vec);
     Coordinates& operator=(const Coordinates & other_vec);
     void save(const char * filename);
+    bool operator==(Coordinates other);
 };
 
 

@@ -212,6 +212,21 @@ bool get_intersection(double * firstLineCoefs, double * secondLineCoefs, double 
     }
 }
 
+void up_right_left(int &first, int &second, int intersections, int i, int end_left_y, int end_right_y, bool right) {
+    if (intersections == 3) {
+        if (i < std::min(end_left_y, end_right_y)) {
+            first   = (right) ? 0 : 1;
+            second  = (right) ? 1 : 2;
+        } else {
+            first   = (right) ? 1 : 0;
+            second  = (right) ? 2 : 1;
+        }
+    } else {
+        first   = (intersections == 2) ? 0 : 1;
+        second  = (intersections == 2) ? 1 : 2;
+    }
+}
+
 bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates object_2) {
 
     std::vector <std::pair<Coordinates, Coordinates>> ribs;
@@ -219,6 +234,9 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
 
     Coordinates left = (object_1.x > object_2.x) ? object_2 : object_1;
     Coordinates right = (object_1.x < object_2.x) ? object_2 : object_1;
+
+    Coordinates up = (object_1.y < object_2.y) ? object_2 : object_1;
+    Coordinates down = (object_1.y > object_2.y) ? object_2 : object_1;
 
     int end_left_x = left.x + left.length * cos(left.phi * M_PI / 180);
     int end_left_y = left.y + left.length * sin(left.phi * M_PI / 180);
@@ -229,10 +247,22 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
     Coordinates end_right(end_right_x, end_right_y);
 
 
-    ribs.push_back(std::make_pair(left, end_left));
-    if (left.y != right.y) ribs.push_back(std::make_pair(left, right));
-    ribs.push_back(std::make_pair(right, end_right));
-    if (left.y != right.y) ribs.push_back(std::make_pair(end_left, end_right));
+    if (up == right) {
+        ribs.push_back(std::make_pair(left, end_left));
+        if (left.y != right.y) ribs.push_back(std::make_pair(left, right));
+        ribs.push_back(std::make_pair(right, end_right));
+        if (left.y != right.y) ribs.push_back(std::make_pair(end_left, end_right));
+    } else if (up == left) {
+
+        ribs.push_back(std::make_pair(left, end_left));
+        if (left.y != right.y) ribs.push_back(std::make_pair(left, right));
+        if (left.y != right.y) ribs.push_back(std::make_pair(end_left, end_right));
+        ribs.push_back(std::make_pair(right, end_right));
+
+    } else {
+        std::cout << "no!\n";
+        return 0;
+    }
 
 
     for (int i = 0; i < ribs.size(); i++) {
@@ -266,17 +296,13 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
             int first_index;
             int second_index;
 
-            if (x_intersect.size() == 3) {
-                if (i < std::min(end_left_y, end_right_y)) {
-                    first_index = 0;
-                    second_index = 1;
-                } else {
-                    first_index = 1;
-                    second_index = 2;
-                }
-            } else {
-                first_index = (x_intersect.size() == 2) ? 0 : 1;
-                second_index = (x_intersect.size() == 2) ? 1 : 2;
+            if (up == right)
+                up_right_left(first_index, second_index, x_intersect.size(), i, end_left_y, end_right_y, 1);
+            else if (up == left) {
+                up_right_left(first_index, second_index, x_intersect.size(), i, end_left_y, end_right_y, 0);
+            } else{
+                std::cout << "there is no options for this case\n";
+                return false;
             }
 
             std::cout << first_index << " : " << second_index << "\n";

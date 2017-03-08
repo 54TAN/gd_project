@@ -44,6 +44,10 @@ Coordinates::Coordinates(double x, double y) :
         x(x),
         y(y)
 {
-    phi = 0;
-    length = 0;
+    coords.push_back(x);
+    coords.push_back(y);
+}
+
+bool Coordinates::operator==(Coordinates other) {
+    return (coords == other.coords) ? true : false;
 }
