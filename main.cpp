@@ -207,7 +207,7 @@ int main(int argc, char ** argv) {
 
     rrt.search(&map, 1);
     rrt.get_path(rrt.nodes.size() - 1);
-    //rrt.optimize_path(&map, 3, 10);
+    rrt.optimize_path(&map, 3, 20);
     std::reverse(go_path.begin(), go_path.end());
 
 

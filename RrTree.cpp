@@ -162,9 +162,10 @@ void RrTree::go(int index) {
 }
 
 void RrTree::optimize_path(Map * map, int step, int iter) {
+
     while (iter) {
         for (int i = 0; i < path.size() - step; i++) {
-            if (is_available(map, path[i], path[i + step])) {
+            if (!is_available_second(map, path[i], path[i + step])) {
                 path.erase(path.begin() + i + 1, path.begin() + i + step - 1);
             }
         }
@@ -212,6 +213,7 @@ bool get_intersection(double * firstLineCoefs, double * secondLineCoefs, double 
     }
 }
 
+static
 void up_right_left(int &first, int &second, int intersections, int i, int end_left_y, int end_right_y, bool right) {
     if (intersections == 3) {
         if (i < std::min(end_left_y, end_right_y)) {
@@ -238,26 +240,58 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
     Coordinates up = (object_1.y < object_2.y) ? object_2 : object_1;
     Coordinates down = (object_1.y > object_2.y) ? object_2 : object_1;
 
-    int end_left_x = left.x + left.length * cos(left.phi * M_PI / 180);
-    int end_left_y = left.y + left.length * sin(left.phi * M_PI / 180);
+    int end_left_x = left.x + left.length * cos(object_1.phi * M_PI / 180);
+    int end_left_y = left.y + left.length * sin(object_1.phi * M_PI / 180);
     Coordinates end_left(end_left_x, end_left_y);
 
-    int end_right_x = right.x + right.length * cos(right.phi * M_PI / 180);
-    int end_right_y = right.y + right.length * sin(right.phi * M_PI / 180);
+    int end_right_x = right.x + right.length * cos(object_1.phi * M_PI / 180);
+    int end_right_y = right.y + right.length * sin(object_1.phi * M_PI / 180);
     Coordinates end_right(end_right_x, end_right_y);
 
+    int end_up_x = up.x + up.length * cos(object_1.phi * M_PI / 180);
+    int end_up_y = up.y + up.length * sin(object_1.phi * M_PI / 180);
+    Coordinates end_up(end_up_x, end_up_y);
 
-    if (up == right) {
+    int end_down_x = down.x + down.length * cos(object_1.phi * M_PI / 180);
+    int end_down_y = down.y + down.length * sin(object_1.phi * M_PI / 180);
+    Coordinates end_down(end_down_x, end_down_y);
+
+
+    if (up == right && up.y <= end_left_y) {
+        std::cout << "one\n";
         ribs.push_back(std::make_pair(left, end_left));
         if (left.y != right.y) ribs.push_back(std::make_pair(left, right));
         ribs.push_back(std::make_pair(right, end_right));
         if (left.y != right.y) ribs.push_back(std::make_pair(end_left, end_right));
-    } else if (up == left) {
 
+    } else if (up == left && up.y <= end_right_y ||
+               up == right && up.y >= end_left_y ||
+               up == left && up.y >= end_right_y) {
+        std::cout << "two\n";
         ribs.push_back(std::make_pair(left, end_left));
         if (left.y != right.y) ribs.push_back(std::make_pair(left, right));
         if (left.y != right.y) ribs.push_back(std::make_pair(end_left, end_right));
         ribs.push_back(std::make_pair(right, end_right));
+
+    } else if (up.x == down.x && (object_1.phi != 90 && object_1.phi != 270)) {
+        std::cout << "herrrrrrrrrrrrrrrrrre\n";
+        if (object_1.phi < 90 || object_1.phi > 270) {
+
+            ribs.push_back(std::make_pair(up, down));
+            ribs.push_back(std::make_pair(down, end_down));
+            ribs.push_back(std::make_pair(end_down, end_up));
+            ribs.push_back(std::make_pair(up, end_up));
+        } else {
+
+            ribs.push_back(std::make_pair(end_down, end_up));
+            ribs.push_back(std::make_pair(down, end_down));
+            ribs.push_back(std::make_pair(up, down));
+            ribs.push_back(std::make_pair(up, end_up));
+        }
+
+    } else if (up.x == down.x && (object_1.phi == 90 || object_1.phi == 270)) {
+
+        ribs.push_back(std::make_pair(up, down));
 
     } else {
         std::cout << "no!\n";
@@ -270,10 +304,22 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
         get_equation(equations[i], ribs[i].first, ribs[i].second);
     }
 
-    int lower_bound_y = std::min(left.y, right.y);
-    int higher_bound_y = std::max(end_left_y, end_right_y);
-    int lower_bound_x = left.x;
-    int higher_bound_x = right.x;
+    int lower_bound_y = std::min(down.y, down.y + down.length * sin(object_1.phi * M_PI / 180));
+    int higher_bound_y = std::max(up.y, up.y + up.length * sin(object_1.phi * M_PI / 180));
+    int lower_bound_x = std::min((int)left.x, end_left_x);
+    int higher_bound_x = std::max((int)right.x, end_left_x + (int)right.x - (int)left.x);
+
+    /*std::cout << "bounds : " << lower_bound_y << " " << higher_bound_y << "\n";
+    std::cout << "bounds : " << lower_bound_x << " " << higher_bound_x << "\n";*/
+
+    if (lower_bound_y == higher_bound_y) {
+        for (int j = lower_bound_x; j < higher_bound_x; j++) {
+            Coordinates pt((double)j, (double)lower_bound_y);
+            if (the_map->is_point_in_obstacle(pt)) {
+                return true;
+            }
+        }
+    }
 
 
     for (int i = lower_bound_y; i < higher_bound_y; i++) { //по высоте
@@ -296,16 +342,54 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
             int first_index;
             int second_index;
 
-            if (up == right)
-                up_right_left(first_index, second_index, x_intersect.size(), i, end_left_y, end_right_y, 1);
-            else if (up == left) {
-                up_right_left(first_index, second_index, x_intersect.size(), i, end_left_y, end_right_y, 0);
-            } else{
-                std::cout << "there is no options for this case\n";
-                return false;
+            if (up == right && i <= up.y && i >= end_left_y && object_1.phi > 0 && object_1.phi < 180 ||
+                up == left && i >= end_right_y && i <= left.y && object_1.phi > 0 && object_1.phi < 180) {
+                std::cout << "here\n";
+                std::cout << x_intersect.size() << std::endl;
+                first_index = 1;
+                second_index = 2;
+
+            } else {
+                if (up == right)
+                    up_right_left(first_index, second_index, x_intersect.size(), i, end_left_y, end_right_y, 1);
+                else if (up == left) {
+                    up_right_left(first_index, second_index, x_intersect.size(), i, end_left_y, end_right_y, 0);
+                } else if (right == left && (object_1.phi < 90 || object_1.phi > 270)) {
+                    up_right_left(first_index, second_index, x_intersect.size(), i, end_down_y, (int)up.y, 1);
+                    /*if (x_intersect.size() == 3) {
+                        if (i <= std::min(end_down_y, (int)up.y)) {
+                            first_index   = 0;
+                            second_index  = 1;
+                        } else {
+                            first_index   = 1;
+                            second_index  = 2;
+                        }
+                    } else {
+                        first_index   = (x_intersect.size() == 2) ? 0 : 1;
+                        second_index  = (x_intersect.size() == 2) ? 1 : 2;
+                    }*/
+                } else if (right == left && (object_1.phi > 90 && object_1.phi < 270)) {
+                    //std::cout << "herreSSSSSSSSSSSSSSSSSSSSS\n";
+                    up_right_left(first_index, second_index, x_intersect.size(), i, (int)up.y, end_down_y, 0);
+                    /*if (x_intersect.size() == 3) {
+                        if (i <= std::min(end_down_y, (int)up.y)) {
+                            first_index   = 1;
+                            second_index  = 2;
+                        } else {
+                            first_index   = 0;
+                            second_index  = 1;
+                        }
+                    } else {
+                        first_index   = (x_intersect.size() == 2) ? 0 : 1;
+                        second_index  = (x_intersect.size() == 2) ? 1 : 2;
+                    }*/
+                } else {
+                    std::cout << "there is no options for this case\n";
+                    return false;
+                }
             }
 
-            std::cout << first_index << " : " << second_index << "\n";
+            //std::cout << first_index << " : " << second_index << "\n";
 
             for (int j = lower_bound_x; j < higher_bound_x; j++) {
                 if ((x_intersect[first_index] <= j && j <= x_intersect[second_index]) ||
@@ -315,6 +399,12 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
                         return true;
                     }
                 }
+            }
+        }  else if (x_intersect.size() == 1 && (object_1.phi == 90 || object_1.phi == 270)) {
+            int j = x_intersect[0];
+            Coordinates pt((double)j, (double)i);
+            if (the_map->is_point_in_obstacle(pt)) {
+                return true;
             }
         }
     }
