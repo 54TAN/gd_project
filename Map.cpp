@@ -26,9 +26,9 @@ Coordinates Map::gen_Point(int width, int height, int len, int min_x, int min_y)
 
     int x_r = rand() % (width - min_x) + min_x;
     int y_r = rand() % (height - min_y) + min_y;
-    int phi = rand() % 90;
+    int phi = rand() % 330;
     //std::cout << x_r << " " << y_r << "\n";
-    Coordinates test_point(x_r, y_r, 90, len);//, phi);
+    Coordinates test_point(x_r, y_r, phi, len);//, phi);
 
     if (!is_valid(test_point)) {
         return test_point;
@@ -147,54 +147,70 @@ bool Map::among_points(Coordinates point) {
 }
 
 
+static
+void get_equation(double * coefs, Coordinates one, Coordinates two) {
+    coefs[0] = two.y - one.y;
+    if (coefs[0] == 0) {
+        coefs[1] = 1;
+        coefs[2] = -1*two.y;
+        return;
+    }
+    coefs[1] = two.x - one.x;
+    if (coefs[1] == 0) {
+        coefs[0] = 1;
+        coefs[2] = -1*two.x;
+        return;
+    }
+    coefs[2] = (-1 * one.x) * coefs[0] + one.y * coefs[1];
+    coefs[1] *= -1;
+}
+
+static
+bool get_intersection(double * firstLineCoefs, double * secondLineCoefs, double * x) {
+
+    double det = firstLineCoefs[0] * secondLineCoefs[1] - firstLineCoefs[1] * secondLineCoefs[0];
+    double det_1 = -1*firstLineCoefs[2] * secondLineCoefs[1] - firstLineCoefs[1] * -1*secondLineCoefs[2];
+    double det_2 = firstLineCoefs[0] * -1*secondLineCoefs[2] - -1*firstLineCoefs[2] * secondLineCoefs[0];
+
+    if (det) {
+        *x = det_1/det;
+        return true;
+    } else {
+
+        if (!det_1 && !det_2) {
+            *x = -1*secondLineCoefs[2];
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+}
+
+
 bool Map::is_valid(Coordinates object) {
 
-    bool ** temp_plain = new bool * [width];
-    for (size_t i = 0; i < width; i++) {
-        temp_plain[i] = new bool [height];
-    }
-    for (size_t i = 0; i < width; i++) {
-        for (size_t j = 0; j < height; j++) {
-            temp_plain[i][j] = false;
-        }
-    }
-
-    double end_x = object.x + object.length * cos(object.phi * M_PI / 180);
-    double end_y = object.y + object.length * sin(object.phi * M_PI / 180);
+    int end_x = object.x + object.length * cos(object.phi * M_PI / 180);
+    int end_y = object.y + object.length * sin(object.phi * M_PI / 180);
 
     if (end_x >= width || end_x <= 0 || end_y <= 0 || end_y >= height) {
         return true;
     }
 
     Coordinates end(end_x, end_y);
-    bresenham(temp_plain, object, end, 0);
-    //std::cout << "shit\n";
-    for (size_t i = 0; i < width; i++) {
-        for (size_t j = 0; j < height; j++) {
+    double * equation = new double[3];
+    get_equation(equation, object, end);
 
-            if (temp_plain[i][j]) { // если что-то есть
-
-
-                Coordinates pt((double)i, (double)j); // запиливаем
-                if (is_point_in_obstacle(pt)) { // каждую точку
-                    for (size_t k = 0; k < width; k++) {
-                        delete [] temp_plain[k];
-                    }
-                    delete temp_plain;
-                    //std::cout << "YOU SHELL NOT PAAAAASS!!!" << std::endl;
-                    return true;
-                }
-
-
+    for (int i = std::min(end_y, (int)object.y); i < std::max(end_y, (int)object.y); i++) {
+        double line[3] = {0, 1, (double) (-1 * (i))};
+        double x;
+        if (get_intersection(line, equation, &x)) {
+            Coordinates pt((double)i, x); // запиливаем
+            if (is_point_in_obstacle(pt)) {
+                return true;
             }
-
         }
     }
-
-    for (size_t k = 0; k < width; k++) {
-        delete [] temp_plain[k];
-    }
-    delete temp_plain;
 
     return false;
 }

@@ -10,7 +10,8 @@
 #include <ctime>
 
 static std::vector <Coordinates> go_path;
-static Coordinates MovableObject(2, 2, 90, 40);
+static std::vector <Coordinates> replicated_path;
+static Coordinates MovableObject(2, 2, 90, 60);
 static Bitmap bmp(width, height);
 static Map map;
 
@@ -21,8 +22,8 @@ void make_map() {
     /*map.points.push_back(Coordinates(45, 36, 350, 60));
     map.points.push_back(Coordinates(30, 30, 110, 60));*/
 
-    map.points.push_back(Coordinates(2, 2, 90, 40));
-    map.points.push_back(Coordinates(198, 2, 90, 40));
+    map.points.push_back(Coordinates(2, 2, 90, 60));
+    map.points.push_back(Coordinates(198, 2, 90, 60));
 
     /*map.points.push_back(Coordinates(20, 35, 190, 20));
     map.points.push_back(Coordinates(30, 30, 270, 20));*/
@@ -155,65 +156,15 @@ int main(int argc, char ** argv) {
 
     make_map();
 
-/*
-    bool ** temp_plane = new bool * [width];
-    for (size_t i = 0; i < width; i++) {
-        temp_plane[i] = new bool [height];
-    }
-    for (size_t i = 0; i < width; i++) {
-        for (size_t j = 0; j < height; j++) {
-            temp_plane[i][j] = false;
-        }
-    }
-
-
-    std::cout << map.points.front().x << " "
-              << map.points.front().y << " "
-            << map.points.front().length << " "
-              << map.points.front().phi << "\n";
-
-    std::cout << map.points.back().x << " "
-              << map.points.back().y << " "
-            << map.points.back().length << " "
-              << map.points.back().phi << "\n";
-
-
-    bresenham_obj(temp_plane, map.points.front(), map.points.back());*/
-
-
-
     RrTree rrt(&map, 500);
-
-/*
-    KdTree kd;
-    kd.nodes.push_back(KdNode(&map.points.front().coords, 0));*/
-
-    /*
-    KdTree kd;
-    kd.nodes.push_back(KdNode(&map.points.front().coords, 0));
-    map.points.push_back(Coordinates(5, 6));
-    //std::cout << rrt.is_available(&map, rrt.nodes.back().point, rrt.goal_state.point);
-    std::cout << rrt.nodes.size() << std::endl;
-    rrt.extend(&map, &kd, 1);
-    std::cout << rrt.nodes.size() << std::endl;
-*/
-
-/*
-    Coordinates one(2, 2);
-    Coordinates two(198, 2);
-    std::cout << rrt.is_available(&map, one, two);*/
-
-
 
     rrt.search(&map, 1);
     rrt.get_path(rrt.nodes.size() - 1);
     rrt.optimize_path(&map, 3, 20);
     std::reverse(go_path.begin(), go_path.end());
 
+    replicated_path = rrt.path;
 
-    /*for (int i = 0; i < rrt.path.size(); i++) {
-        std::cout << rrt.path[i].x << " " << rrt.path[i].y << " " << rrt.path[i].phi << std::endl;
-    }*/
 
     render_path(rrt.path, &bmp, 0, 0, true, &go_path);
     std::reverse(go_path.begin(), go_path.end());

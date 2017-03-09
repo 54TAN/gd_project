@@ -229,6 +229,54 @@ void up_right_left(int &first, int &second, int intersections, int i, int end_le
     }
 }
 
+static
+bool get_intersection_circle(double * coords, Coordinates circle, std::pair <Coordinates *, Coordinates *> pair) {
+
+    double k = coords[0] / (-1*coords[1]);
+    double b = coords[2] / (-1*coords[1]);
+
+    double d = pow(2 * k * b - 2 * circle.x - 2 * circle.y * k,2)
+               - (4 + 4 * k * k) * (b * b - pow(circle.length, 2) + pow(circle.x, 2) + pow(circle.y, 2) - 2 * circle.y * b);
+
+    if (d < 0) {
+        pair.first->x = -1;
+        pair.first->y = -1;
+        pair.second->x = -1;
+        pair.second->y = -1;
+        //std::cout << "none\n";
+        return false;
+    }
+
+    double x_1 = -1 * ((2 * k * b - 2 * circle.x - 2 * circle.y * k) - sqrt(d)) / (2 + 2 * k * k);
+    double x_2 = -1 * ((2 * k * b - 2 * circle.x - 2 * circle.y * k) + sqrt(d)) / (2 + 2 * k * k);
+
+
+    if (x_1 == x_2) {
+        double y = k * x_1 + b;
+
+        pair.first->x = x_1;
+        pair.first->y = y;
+        pair.second->x = x_1;
+        pair.second->y = y;
+
+        //std::cout << "one\n";
+        return true;
+
+    }
+
+    double y_1 = k * x_1 + b;
+    double y_2 = k * x_2 + b;
+
+    pair.first->x = x_1;
+    pair.first->y = y_1;
+    pair.second->x = x_2;
+    pair.second->y = y_2;
+
+    //std::cout << "two\n";
+
+    return true;
+}
+
 bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates object_2) {
 
     std::vector <std::pair<Coordinates, Coordinates>> ribs;
@@ -274,7 +322,7 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
         ribs.push_back(std::make_pair(right, end_right));
 
     } else if (up.x == down.x && (object_1.phi != 90 && object_1.phi != 270)) {
-        std::cout << "herrrrrrrrrrrrrrrrrre\n";
+        //std::cout << "herrrrrrrrrrrrrrrrrre\n";
         if (object_1.phi < 90 || object_1.phi > 270) {
 
             ribs.push_back(std::make_pair(up, down));
@@ -408,6 +456,189 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
             }
         }
     }
+
+    std::vector <std::pair<Coordinates, Coordinates>> pizza(3, std::make_pair(object_1, object_2));
+    std::vector <double*> pizza_equations;
+
+    Coordinates more = (object_1.phi < object_2.phi) ? object_2 : object_1;
+    Coordinates less = (object_1.phi > object_2.phi) ? object_2 : object_1;
+
+    int end_less_x = object_2.x + object_2.length * cos(less.phi * M_PI / 180);
+    int end_less_y = object_2.y + object_2.length * sin(less.phi * M_PI / 180);
+    Coordinates end_less(end_less_x, end_less_y);
+
+    int end_more_x = object_2.x + object_2.length * cos(more.phi * M_PI / 180);
+    int end_more_y = object_2.y + object_2.length * sin(more.phi * M_PI / 180);
+    Coordinates end_more(end_more_x, end_more_y);
+
+    size_t circle_index = (more.phi < 180) ? 2 : 1;
+    size_t less_index = (more.phi < 180) ? 1 : 0;
+    size_t more_index = (more.phi < 180) ? 0 : 2;
+
+//    тривиальные границы, в ветвлениях, они скоррекстируются
+//    тривиальные - это без учета окружнстей, только по вершинам
+    int low_bound_x = std::min((int)object_2.x, std::min(end_less_x, end_more_x));
+    int low_bound_y = std::min((int)object_2.y, std::min(end_less_y, end_more_y));
+    int high_bound_x = std::max((int)object_2.x, std::max(end_less_x, end_more_x));
+    int high_bound_y = std::max((int)object_2.y,std::max(end_less_y, end_more_y));
+
+    if (less.phi < 90 && more.phi > 90) {
+        high_bound_y = object_2.y + object_2.length;
+        more_index = 0;
+        less_index = 1;
+        circle_index = 2;
+    }
+
+    if (more.phi > 270 && less.phi < 270 && abs(less.phi - more.phi) < 180) {
+        low_bound_y = object_2.y - object_2.length;
+        less_index = 1;
+        circle_index = 0;
+        more_index = 2;
+    }
+
+    if (less.phi < 90 && more.phi > less.phi + 180) {
+        //std::cout << "been there\n";
+        high_bound_x = object_2.x + object_2.length;
+        more_index = 0;   //1
+        circle_index = 2;  //0
+        less_index = 1;   //2
+        if (more.phi > less.phi + 180) {
+            high_bound_y = end_less_y;
+            //low_bound_y = object_2.y - object_1.length;
+            if (more.phi > 270) low_bound_y = end_more_y;
+        }
+    }
+
+    if (less.phi < 180 && more.phi > 180) {
+        //std::cout << "been there\n";
+        if (abs(less.phi - more.phi) < 180) {
+            circle_index = 0; // 0
+            more_index = 1;  // 1
+            less_index = 2;   // 2
+            low_bound_x = object_2.x - object_2.length;
+        }
+        if (more.phi > less.phi + 180) {
+            circle_index = 2; // 0
+            more_index = 0;  // 1
+            less_index = 1;   // 2
+            high_bound_y = end_less_y;
+            low_bound_y = end_more_y;
+        }
+    }
+
+    if (abs(end_less.x - end_more.x) <= 1 && abs(less.phi - more.phi) > 179) {
+
+        low_bound_x = object_2.x;
+        high_bound_x = object_2.x + object_2.length;
+    }
+
+    pizza[circle_index] = std::make_pair(less, less);
+    pizza[less_index] = std::make_pair(object_2, end_less);
+    pizza[more_index] = std::make_pair(object_2, end_more);
+
+    for (int i = 0; i < pizza.size(); i++) {
+        if (i != circle_index){
+            pizza_equations.push_back(new double [3]);
+            get_equation(pizza_equations[i], pizza[i].first, pizza[i].second);
+        } else {
+            pizza_equations.push_back(NULL);
+        }
+    }
+
+    for (int i = low_bound_y; i <= high_bound_y; i++) { //по высоте
+
+        double line[3] = {0, 1, (double) (-1 * (i))};
+
+        double x = -1;
+        std::vector<double> x_intersect;
+
+        bool only_circle = false;
+
+        for (int i = 0; i < pizza_equations.size(); i++) {
+
+            if (i != circle_index) {
+                if (get_intersection(line, pizza_equations[i], &x)) {
+                    if (x >= low_bound_x && x <= high_bound_x) {
+                        x_intersect.push_back(x);
+                        std::cout << "here ";
+                    }
+                }
+            } else {
+                std::pair <Coordinates*, Coordinates*> pair =
+                        std::make_pair(new Coordinates(-1, -1), new Coordinates(-1, -1));
+
+                if (get_intersection_circle(line, object_2, pair)) {
+                    if (pair.first->x == pair.second->x) {
+                        //one intersecrion
+                        if (pair.first->x <= high_bound_x && pair.first->x >= low_bound_x) {
+                            x_intersect.push_back(pair.first->x);
+                            only_circle = true;
+                        }
+                        //x_intersect.push_back(pair.first->x);
+                        //only_circle = true;
+                    } else {
+                        //x_intersect.clear();
+
+
+                        if (pair.first->x <= high_bound_x && pair.first->x >= low_bound_x) {
+                            x_intersect.push_back(pair.first->x);
+                            std::cout << "crcl\n";
+                        }
+                        if (pair.second->x <= high_bound_x && pair.second->x >= low_bound_x) {
+                            x_intersect.push_back(pair.second->x);
+                            std::cout << "crcl\n";
+                        }
+                        if (pair.first->x <= high_bound_x && pair.first->x >= low_bound_x &&
+                            pair.second->x <= high_bound_x && pair.second->x >= low_bound_x) {
+                            //std::cout << "TWO\n";
+                            x_intersect.clear();
+                            x_intersect.push_back(pair.first->x);
+                            x_intersect.push_back(pair.second->x);
+
+                        }
+                        //break;
+                    }
+                }
+            }
+        }
+
+
+        int first_index = (x_intersect.size() == 2) ? 0 : 1;
+        int second_index = (x_intersect.size() == 2) ? 1 : 2;
+
+        std::cout << x_intersect.size() << " i : " << i <<"\n";
+        if (x_intersect.size() == 3 && i < object_2.y && less.phi > 45) {
+            first_index = 0;
+            second_index = 1;
+            std::cout << "f : " << first_index << " s : " << second_index << "\n";
+            std::cout << x_intersect[0] << " : " << x_intersect[1] << " : " << x_intersect[2] << "\n";
+        }
+
+
+
+        if (x_intersect.size() > 1) {
+            //std::cout << "in here\n";
+            for (int j = low_bound_x; j <= high_bound_x; j++) {
+                if ((x_intersect[first_index] <= j && j <= x_intersect[second_index]) ||
+                    (x_intersect[first_index] >= j && j >= x_intersect[second_index])) {
+                    //std::cout << "HERRRRE\n";
+                    Coordinates pt((double)j, (double)i);
+                    if (the_map->is_point_in_obstacle(pt)) {
+                        return true;
+                    }
+
+                }
+            }
+        } else if (x_intersect.size() == 1 && only_circle) {
+            //std::cout << "here\n";
+            Coordinates pt((double)(int)x_intersect[0], (double)i);
+            if (the_map->is_point_in_obstacle(pt)) {
+                return true;
+            }
+        }
+
+    }
+
 
     return false;
 
