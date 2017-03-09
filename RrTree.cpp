@@ -289,24 +289,32 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
     Coordinates down = (object_1.y > object_2.y) ? object_2 : object_1;
 
     int end_left_x = left.x + left.length * cos(object_1.phi * M_PI / 180);
+    if (end_left_x < 0 || end_left_x >= width) return true;
     int end_left_y = left.y + left.length * sin(object_1.phi * M_PI / 180);
+    if (end_left_y < 0 || end_left_y >= height) return true;
     Coordinates end_left(end_left_x, end_left_y);
 
     int end_right_x = right.x + right.length * cos(object_1.phi * M_PI / 180);
+    if (end_right_x < 0 || end_right_x >= width) return true;
     int end_right_y = right.y + right.length * sin(object_1.phi * M_PI / 180);
+    if (end_right_y < 0 || end_right_y >= height) return true;
     Coordinates end_right(end_right_x, end_right_y);
 
     int end_up_x = up.x + up.length * cos(object_1.phi * M_PI / 180);
+    if (end_up_x < 0 || end_up_x >= width) return true;
     int end_up_y = up.y + up.length * sin(object_1.phi * M_PI / 180);
+    if (end_up_y < 0 || end_up_y >= height) return true;
     Coordinates end_up(end_up_x, end_up_y);
 
     int end_down_x = down.x + down.length * cos(object_1.phi * M_PI / 180);
+    if (end_down_x < 0 || end_down_x >= width) return true;
     int end_down_y = down.y + down.length * sin(object_1.phi * M_PI / 180);
+    if (end_down_y < 0 || end_down_y >= height) return true;
     Coordinates end_down(end_down_x, end_down_y);
 
 
     if (up == right && up.y <= end_left_y) {
-        std::cout << "one\n";
+        //std::cout << "one\n";
         ribs.push_back(std::make_pair(left, end_left));
         if (left.y != right.y) ribs.push_back(std::make_pair(left, right));
         ribs.push_back(std::make_pair(right, end_right));
@@ -315,7 +323,7 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
     } else if (up == left && up.y <= end_right_y ||
                up == right && up.y >= end_left_y ||
                up == left && up.y >= end_right_y) {
-        std::cout << "two\n";
+        //std::cout << "two\n";
         ribs.push_back(std::make_pair(left, end_left));
         if (left.y != right.y) ribs.push_back(std::make_pair(left, right));
         if (left.y != right.y) ribs.push_back(std::make_pair(end_left, end_right));
@@ -357,6 +365,11 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
     int lower_bound_x = std::min((int)left.x, end_left_x);
     int higher_bound_x = std::max((int)right.x, end_left_x + (int)right.x - (int)left.x);
 
+    if (lower_bound_x < 0 || lower_bound_x >= width) return true;
+    if (higher_bound_x < 0 || higher_bound_x >= width) return true;
+    if (lower_bound_y < 0 || lower_bound_y >= height) return true;
+    if (higher_bound_y < 0 || higher_bound_y >= height) return true;
+
     /*std::cout << "bounds : " << lower_bound_y << " " << higher_bound_y << "\n";
     std::cout << "bounds : " << lower_bound_x << " " << higher_bound_x << "\n";*/
 
@@ -385,15 +398,15 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
         }
 
         if (x_intersect.size() >= 2) {
-            std::cout << x_intersect.size() << std::endl;
+            //std::cout << x_intersect.size() << std::endl;
 
             int first_index;
             int second_index;
 
             if (up == right && i <= up.y && i >= end_left_y && object_1.phi > 0 && object_1.phi < 180 ||
                 up == left && i >= end_right_y && i <= left.y && object_1.phi > 0 && object_1.phi < 180) {
-                std::cout << "here\n";
-                std::cout << x_intersect.size() << std::endl;
+                //std::cout << "here\n";
+                //std::cout << x_intersect.size() << std::endl;
                 first_index = 1;
                 second_index = 2;
 
@@ -464,11 +477,15 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
     Coordinates less = (object_1.phi > object_2.phi) ? object_2 : object_1;
 
     int end_less_x = object_2.x + object_2.length * cos(less.phi * M_PI / 180);
+    if (end_less_x < 0 || end_less_x >= width) return true;
     int end_less_y = object_2.y + object_2.length * sin(less.phi * M_PI / 180);
+    if (end_less_y < 0 || end_less_y >= width) return true;
     Coordinates end_less(end_less_x, end_less_y);
 
     int end_more_x = object_2.x + object_2.length * cos(more.phi * M_PI / 180);
+    if (end_more_x < 0 || end_more_x >= width) return true;
     int end_more_y = object_2.y + object_2.length * sin(more.phi * M_PI / 180);
+    if (end_more_x < 0 || end_more_x >= width) return true;
     Coordinates end_more(end_more_x, end_more_y);
 
     size_t circle_index = (more.phi < 180) ? 2 : 1;
@@ -481,6 +498,7 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
     int low_bound_y = std::min((int)object_2.y, std::min(end_less_y, end_more_y));
     int high_bound_x = std::max((int)object_2.x, std::max(end_less_x, end_more_x));
     int high_bound_y = std::max((int)object_2.y,std::max(end_less_y, end_more_y));
+
 
     if (less.phi < 90 && more.phi > 90) {
         high_bound_y = object_2.y + object_2.length;
@@ -531,6 +549,12 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
         low_bound_x = object_2.x;
         high_bound_x = object_2.x + object_2.length;
     }
+
+    if (low_bound_x < 0 || low_bound_x >= width) return true;
+    if (high_bound_x < 0 || high_bound_x >= width) return true;
+    if (low_bound_y < 0 || low_bound_y >= height) return true;
+    if (high_bound_y < 0 || high_bound_y >= height) return true;
+
 
     pizza[circle_index] = std::make_pair(less, less);
     pizza[less_index] = std::make_pair(object_2, end_less);

@@ -19,33 +19,31 @@ void make_map() {
     map.height = height;
     map.width = width;
     map.obstacles.push_back(Obstacle(Coordinates(95, 0), Coordinates(105, 100)));
-    /*map.points.push_back(Coordinates(45, 36, 350, 60));
-    map.points.push_back(Coordinates(30, 30, 110, 60));*/
 
     map.points.push_back(Coordinates(2, 2, 90, 60));
     map.points.push_back(Coordinates(198, 2, 90, 60));
 
     /*map.points.push_back(Coordinates(20, 35, 190, 20));
-    map.points.push_back(Coordinates(30, 30, 270, 20));*/
+    map.points.push_back(Coordinates(30, 30, 270, 20));
 
-   /* map.points.push_back(Coordinates(30, 30, 355, 60));
-    map.points.push_back(Coordinates(30, 30, 95, 60));*/
-
-
-    /*map.points.push_back(Coordinates(45, 30, 55, 60));
-    map.points.push_back(Coordinates(30, 36, 110, 60));*/
-    /*map.points.push_back(Coordinates(45, 36, 55, 60));
-    map.points.push_back(Coordinates(30, 30, 110, 60));*/
+    map.points.push_back(Coordinates(30, 30, 355, 60));
+    map.points.push_back(Coordinates(30, 30, 95, 60));
 
 
-    /*map.points.push_back(Coordinates(35, 20, 55, 60));
-    map.points.push_back(Coordinates(20, 26, 80, 60));*/
-    /*map.points.push_back(Coordinates(35, 26, 55, 60));
-    map.points.push_back(Coordinates(20, 20, 80, 60));*/
+    map.points.push_back(Coordinates(45, 30, 55, 60));
+    map.points.push_back(Coordinates(30, 36, 110, 60));
+    map.points.push_back(Coordinates(45, 36, 55, 60));
+    map.points.push_back(Coordinates(30, 30, 110, 60));
 
-    /*map.points.push_back(Coordinates(35, 20, 120, 60));
-    map.points.push_back(Coordinates(20, 26, 80, 60));*/
-    /*map.points.push_back(Coordinates(35, 26, 120, 60));
+
+    map.points.push_back(Coordinates(35, 20, 55, 60));
+    map.points.push_back(Coordinates(20, 26, 80, 60));
+    map.points.push_back(Coordinates(35, 26, 55, 60));
+    map.points.push_back(Coordinates(20, 20, 80, 60));
+
+    map.points.push_back(Coordinates(35, 20, 120, 60));
+    map.points.push_back(Coordinates(20, 26, 80, 60));
+    map.points.push_back(Coordinates(35, 26, 120, 60));
     map.points.push_back(Coordinates(20, 20, 80, 60));*/
     render_map(map, &bmp);
     bmp.out_bmp("MAP_PATH.bmp");
@@ -109,14 +107,23 @@ void rrt_in_window() {
 
 void move() {
     static long long i = 0;
+    static int new_phi = MovableObject.phi;
+    static int step = 1;
 
     if (i != go_path.size()) {
         std::vector <Coordinates> current_coords;
+        //почистили
         map.points.clear();
         render_map(map, &bmp);
+
+
         MovableObject.x = go_path[i].x;
         //std::cout << go_path[i].x << "\n";
         MovableObject.y = go_path[i].y;
+        if (go_path[i].phi != 0) new_phi = go_path[i].phi;
+
+        if (new_phi < MovableObject.phi) step *= -1;
+        if (new_phi > MovableObject.phi) step = abs(step);
 
         int end_MovableObject_x = (MovableObject.x + MovableObject.length * cos(MovableObject.phi * M_PI / 180));
         int end_MovableObject_y = MovableObject.y + MovableObject.length * sin(MovableObject.phi * M_PI / 180);
@@ -126,6 +133,22 @@ void move() {
 
         render_path(current_coords, &bmp, 0);
         bmp.out_bmp("MAP_PATH.bmp");
+        glutPostRedisplay();
+
+        while (MovableObject.phi != new_phi) {
+            int end_MovableObject_x = (MovableObject.x + MovableObject.length * cos(MovableObject.phi * M_PI / 180));
+            int end_MovableObject_y = MovableObject.y + MovableObject.length * sin(MovableObject.phi * M_PI / 180);
+
+            current_coords.push_back(MovableObject);
+            current_coords.push_back(Coordinates(end_MovableObject_x, end_MovableObject_y));
+
+            render_path(current_coords, &bmp, 0);
+            MovableObject.phi += step;
+            bmp.out_bmp("MAP_PATH.bmp");
+            glutPostRedisplay();
+        }
+
+        new_phi = MovableObject.phi;
 
         i++;
         glutPostRedisplay();
@@ -165,9 +188,31 @@ int main(int argc, char ** argv) {
 
     replicated_path = rrt.path;
 
-
     render_path(rrt.path, &bmp, 0, 0, true, &go_path);
     std::reverse(go_path.begin(), go_path.end());
+    std::cout << "treee is done\n";
+    for (size_t i = 0; i < go_path.size(); i++) {
+        for (int j = 0; j < replicated_path.size(); ++j) {
+            if (go_path[i].x == replicated_path[j].x && go_path[i].y == replicated_path[j].y) {
+
+                go_path[i] = replicated_path[j];
+
+            }
+
+            //std::cout << go_path[i].x << " " << go_path[i].y << " " << go_path[i].phi << "\n";
+        }
+
+    }
+
+    /*for (size_t i = 1; i < go_path.size(); i++) {
+        if (go_path[i] == go_path[i - 1]) {
+            go_path.erase(go_path.begin() + i);
+        }
+    }*/
+
+    for (size_t i = 1; i < go_path.size(); i++) {
+        std::cout << go_path[i].x << " " << go_path[i].y << " " << go_path[i].phi << "\n";
+    }
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);

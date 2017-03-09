@@ -46,6 +46,8 @@ Coordinates::Coordinates(double x, double y) :
 {
     coords.push_back(x);
     coords.push_back(y);
+    phi = 0;
+    coords.push_back(0);
 }
 
 bool Coordinates::operator==(Coordinates other) {
