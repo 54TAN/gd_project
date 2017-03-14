@@ -584,7 +584,7 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
                 if (get_intersection(line, pizza_equations[i], &x)) {
                     if (x >= low_bound_x && x <= high_bound_x) {
                         x_intersect.push_back(x);
-                        std::cout << "here ";
+                        //std::cout << "here ";
                     }
                 }
             } else {
@@ -606,11 +606,11 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
 
                         if (pair.first->x <= high_bound_x && pair.first->x >= low_bound_x) {
                             x_intersect.push_back(pair.first->x);
-                            std::cout << "crcl\n";
+                            //std::cout << "crcl\n";
                         }
                         if (pair.second->x <= high_bound_x && pair.second->x >= low_bound_x) {
                             x_intersect.push_back(pair.second->x);
-                            std::cout << "crcl\n";
+                            //std::cout << "crcl\n";
                         }
                         if (pair.first->x <= high_bound_x && pair.first->x >= low_bound_x &&
                             pair.second->x <= high_bound_x && pair.second->x >= low_bound_x) {
@@ -630,12 +630,12 @@ bool RrTree::is_available_second(Map *the_map, Coordinates object_1, Coordinates
         int first_index = (x_intersect.size() == 2) ? 0 : 1;
         int second_index = (x_intersect.size() == 2) ? 1 : 2;
 
-        std::cout << x_intersect.size() << " i : " << i <<"\n";
+        //std::cout << x_intersect.size() << " i : " << i <<"\n";
         if (x_intersect.size() == 3 && i < object_2.y && less.phi > 45) {
             first_index = 0;
             second_index = 1;
-            std::cout << "f : " << first_index << " s : " << second_index << "\n";
-            std::cout << x_intersect[0] << " : " << x_intersect[1] << " : " << x_intersect[2] << "\n";
+            //std::cout << "f : " << first_index << " s : " << second_index << "\n";
+            //std::cout << x_intersect[0] << " : " << x_intersect[1] << " : " << x_intersect[2] << "\n";
         }
 
 

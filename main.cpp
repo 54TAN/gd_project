@@ -58,6 +58,24 @@ void reshape(int w, int h) {
     glLoadIdentity();
 }
 
+
+/*
+ *
+ * план:
+ *  постановка задачи
+ *      построение траектории движения двуногого механизма (в 3д, вид сверху)
+ *      задача сводится к построению последовательности положний ступней
+ *
+ *  Метод решения
+ *      ррт + кд
+ *
+ *  Результаты
+ *      реализованопредставление карты
+ *      реализован базовый алгоритм ррт и кд
+ *
+ *
+ *
+ * */
 void display(void) {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -77,6 +95,7 @@ void display(void) {
     glutSwapBuffers();
     delete data;
 }
+
 /*
 
 void rrt_in_window() {
@@ -106,6 +125,7 @@ void rrt_in_window() {
 */
 
 void move() {
+
     static long long i = 0;
     static int new_phi = MovableObject.phi;
     static int step = 1;
@@ -183,14 +203,17 @@ int main(int argc, char ** argv) {
 
     rrt.search(&map, 1);
     rrt.get_path(rrt.nodes.size() - 1);
-    rrt.optimize_path(&map, 3, 20);
     std::reverse(go_path.begin(), go_path.end());
 
     replicated_path = rrt.path;
 
     render_path(rrt.path, &bmp, 0, 0, true, &go_path);
     std::reverse(go_path.begin(), go_path.end());
-    std::cout << "treee is done\n";
+
+    for (int i = 0; i < replicated_path.size(); ++i) {
+        std::cout << replicated_path[i].x << " " << replicated_path[i].y << " " << replicated_path[i].phi << "\n";
+    }
+
     for (size_t i = 0; i < go_path.size(); i++) {
         for (int j = 0; j < replicated_path.size(); ++j) {
             if (go_path[i].x == replicated_path[j].x && go_path[i].y == replicated_path[j].y) {
@@ -210,9 +233,9 @@ int main(int argc, char ** argv) {
         }
     }*/
 
-    for (size_t i = 1; i < go_path.size(); i++) {
+    /*for (size_t i = 1; i < go_path.size(); i++) {
         std::cout << go_path[i].x << " " << go_path[i].y << " " << go_path[i].phi << "\n";
-    }
+    }*/
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
