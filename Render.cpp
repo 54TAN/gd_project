@@ -53,12 +53,13 @@ void bresenham(bool **temp_plane, Coordinates point_1, Coordinates point_2,
                 else coords->push_back(Coordinates(y, x));
             }
         } else {
-            //std::cout << y << " ";
+            std::cout << y << " ";
+            std::cout << x << std::endl;
             if (op) temp_plane[x][y] = true;
             else temp_plane[y][x] = true;
         }
     } while (x != fin_x || y != fin_y);
-    std::cout << std::endl;
+//    std::cout << std::endl;
 }
 
 void render_map(Map the_map, Bitmap *bmp) {

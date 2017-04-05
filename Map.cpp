@@ -1,5 +1,6 @@
 #include "Map.h"
 #include "Render.h"
+#include "Geometry.h"
 
 #include <algorithm>
 #include <iostream>
@@ -146,48 +147,6 @@ bool Map::among_points(Coordinates point) {
     return false;
 }
 
-
-static
-void get_equation(double * coefs, Coordinates one, Coordinates two) {
-    coefs[0] = two.y - one.y;
-    if (coefs[0] == 0) {
-        coefs[1] = 1;
-        coefs[2] = -1*two.y;
-        return;
-    }
-    coefs[1] = two.x - one.x;
-    if (coefs[1] == 0) {
-        coefs[0] = 1;
-        coefs[2] = -1*two.x;
-        return;
-    }
-    coefs[2] = (-1 * one.x) * coefs[0] + one.y * coefs[1];
-    coefs[1] *= -1;
-}
-
-static
-bool get_intersection(double * firstLineCoefs, double * secondLineCoefs, double * x) {
-
-    double det = firstLineCoefs[0] * secondLineCoefs[1] - firstLineCoefs[1] * secondLineCoefs[0];
-    double det_1 = -1*firstLineCoefs[2] * secondLineCoefs[1] - firstLineCoefs[1] * -1*secondLineCoefs[2];
-    double det_2 = firstLineCoefs[0] * -1*secondLineCoefs[2] - -1*firstLineCoefs[2] * secondLineCoefs[0];
-
-    if (det) {
-        *x = det_1/det;
-        return true;
-    } else {
-
-        if (!det_1 && !det_2) {
-            *x = -1*secondLineCoefs[2];
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-}
-
-
 bool Map::is_valid(Coordinates object) {
 
     int end_x = object.x + object.length * cos(object.phi * M_PI / 180);
@@ -199,12 +158,12 @@ bool Map::is_valid(Coordinates object) {
 
     Coordinates end(end_x, end_y);
     double * equation = new double[3];
-    get_equation(equation, object, end);
+    Geometry::get_equation(equation, object, end);
 
     for (int i = std::min(end_y, (int)object.y); i < std::max(end_y, (int)object.y); i++) {
         double line[3] = {0, 1, (double) (-1 * (i))};
         double x;
-        if (get_intersection(line, equation, &x)) {
+        if (Geometry::get_intersection(line, equation, &x)) {
             Coordinates pt((double)i, x); // запиливаем
             if (is_point_in_obstacle(pt)) {
                 return true;
