@@ -16,9 +16,8 @@ struct RrTree {
     RrTree(Map* the_map, double distance);
     RrTree(double distance);
     void search(Map* the_map, bool search, Bitmap * bmp = NULL); // search = 1 = kd
-    bool is_available(Map* the_map, Coordinates point_1, Coordinates point_2);
-    bool is_available_second(Map* the_map, Coordinates object_1, Coordinates object_2);
-    double get_distance(Coordinates point_1, Coordinates point_2);
+    bool is_available(Map* the_map, Coordinates object_1, Coordinates object_2);
+    inline double get_distance(Coordinates point_1, Coordinates point_2);
     void extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp = NULL);
     void get_path(int index);
     void go(int index);
