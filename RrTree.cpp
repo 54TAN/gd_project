@@ -58,7 +58,11 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp) {
         }
     }
     //std::cout << "Sdsdsdsd" << std::endl;
+    //еще одна точка, чтобы было действительно достижимо
+    Coordinates extra_point = new_point;
+    extra_point.phi = nodes[best_index].point.phi;
     if (!is_available(the_map, new_point, nodes[best_index].point)  &&
+        !is_available(the_map, extra_point, nodes[best_index].point) &&
         sqrt(best_distance) <= this->min_distance) {
 
         nodes.push_back(RrtNode(new_point, best_index));
@@ -121,8 +125,8 @@ void RrTree::go(int index) {
     }
 }
 
-void RrTree::optimize_path(Map * map, int step, int iter) {
-
+void RrTree::optimize_path(Map * map, int step, int iter) 
+{
     while (iter) {
         for (int i = 0; i < path.size() - step; i++) {
             if (!is_available(map, path[i], path[i + step])) {

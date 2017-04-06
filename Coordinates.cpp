@@ -53,3 +53,8 @@ Coordinates::Coordinates(double x, double y) :
 bool Coordinates::operator==(Coordinates other) {
     return (coords == other.coords) ? true : false;
 }
+
+bool Coordinates::operator!=(Coordinates other)
+{
+    return !(*this == other);
+}
