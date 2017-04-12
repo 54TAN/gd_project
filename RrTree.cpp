@@ -127,12 +127,25 @@ void RrTree::go(int index) {
 
 void RrTree::optimize_path(Map * map, int step, int iter) 
 {
-    while (iter) {
-        for (int i = 0; i < path.size() - step; i++) {
-            if (!is_available(map, path[i], path[i + step])) {
-                path.erase(path.begin() + i + 1, path.begin() + i + step - 1);
+    while (iter && path.size() > step) {
+        std::vector<Coordinates> new_path;
+        new_path.push_back(path[0]);
+
+        std::vector<Coordinates>::size_type index = 0;
+        std::vector<Coordinates>::size_type end = path.size() - step;
+        std::cout << "index " << index << " end " << end << "\n";
+        while (index < end) {
+            if (! is_available(map, path[index], path[index + step])){
+                if (new_path.back() != path[index]) new_path.push_back(path[index]);
+                new_path.push_back(path[index + step]);
+                index += step;
+            } else {
+                index++;
             }
+
         }
+        new_path.push_back(path.back());
+        if (new_path.size() > 2) path = new_path;
         iter--;
     }
 }
