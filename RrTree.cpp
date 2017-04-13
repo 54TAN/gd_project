@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include <string>
 
 #include "RrTree.h"
 #include "Render.h"
@@ -26,7 +27,8 @@ void RrTree::search(Map* the_map, bool search, Bitmap * bmp) {
         /*std::cout << nodes.back().point.x << " "
                   << nodes.back().point.y << " "
                   << nodes.back().point.phi << "\n";
-        */this->extend(the_map, &kd, search, bmp);
+        */
+        extend(the_map, &kd, search, bmp);
         //std::cout //<< nodes.back().point.x << " "
                   //<< nodes.back().point.y << " ";
                   //<< nodes.back().point.phi << "\n";
@@ -62,21 +64,24 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp) {
     Coordinates extra_point = new_point;
     extra_point.phi = nodes[best_index].point.phi;
     if (!is_available(the_map, new_point, nodes[best_index].point)  &&
-        !is_available(the_map, extra_point, nodes[best_index].point) &&
+//        !is_available(the_map, extra_point, nodes[best_index].point) &&
         sqrt(best_distance) <= this->min_distance) {
 
         nodes.push_back(RrtNode(new_point, best_index));
         kd->push(new_point.coords, 0, -1, -1);
         nodes[best_index].children.push_back(nodes.size() - 1);
 
-        if (bmp) {
+        if (bmp && counter % 10) {
             //out in .bmp
             for (size_t i = 0; i < nodes.size(); i++) {
                 go(i);
                 if (edges.size())
                     render_path(edges, bmp, 0);
             }
-            bmp->out_bmp("MAP_PATH.bmp");
+            std::string name = "bmp";
+            name += std::to_string(counter);
+            name += ".bmp";
+            bmp->out_bmp(name.c_str());
 
         }
         //info to cmd
@@ -125,14 +130,28 @@ void RrTree::go(int index) {
     }
 }
 
-void RrTree::optimize_path(Map * map, int step, int iter) 
+void RrTree::optimize_path(Map * map, int iter) 
 {
-    while (iter && path.size() > step) {
+    unsigned step = 2;
+    /*
+    while (iter) {
+        auto beg = path.begin();
+        for (;beg != path.end() - step;) {
+            if (! is_available(map, *beg, *(beg + step))) {
+                beg = path.erase(beg + 1);
+            } else {
+                beg++;
+            }
+        }
+        iter--;
+    }
+    */
+    while (iter) {
         std::vector<Coordinates> new_path;
         new_path.push_back(path[0]);
 
         std::vector<Coordinates>::size_type index = 0;
-        std::vector<Coordinates>::size_type end = path.size() - step;
+        std::vector<Coordinates>::size_type end = path.size() - step - 1;
         std::cout << "index " << index << " end " << end << "\n";
         while (index < end) {
             if (! is_available(map, path[index], path[index + step])){
@@ -150,12 +169,55 @@ void RrTree::optimize_path(Map * map, int step, int iter)
     }
 }
 
-bool RrTree::is_available(Map *the_map, Coordinates object_1, Coordinates object_2) {
+bool RrTree::is_available(Map *the_map, Coordinates object_1, Coordinates object_2) 
+{
+    //only for gif
+    /*
+    double * equation = new double[3];
+    Geometry::get_equation(equation, object_1, object_2);
+    std::cout << "equation " << equation[0] << " " << equation[1] << " " << equation[2] << "\n";
+    double low_bound = std::min(object_1.y, object_2.y);
+    double high_bound = std::max(object_1.y, object_2.y);
+*/
+    bool ** some;
+    std::vector<Coordinates> coords_for_check;
+    bresenham(some, object_1, object_2, 0, 0, 0, 0, &coords_for_check);
+    //std::cout << "coords_for_check.size()" << coords_for_check.size() << "\n";
+    for (auto item : coords_for_check) {
+        if (the_map->is_point_in_obstacle(item)) {
+            return true;
+        }
+    }
+/*
+    for (int i = low_bound; i < high_bound; i++) {
+        double line[3] = {0, 1, (double) (-1 * (i))};
+        double x;
+        for (int j = std::min(object_1.x, object_2.x); j < std::max(object_2.x, object_1.x); j++) {
+            std::cout << -i*equation[1] << " " << j*equation[0] + equation[2] << "\n" ;
+            if (equation[1] == round(j*equation[0]/(-i) + (int)equation[2]/(-i))) {
+                //std::cout << j << " " << i << "\n";
+                if (the_map->is_point_in_obstacle(Coordinates(j, i))) {
+                    return true;
+                }
+            }
+        }
+ */       /*
+        if (Geometry::get_intersection(line, equation, &x)) {
+            std::cout << x << " " << i << "\n";
+            Coordinates pt(x, i); // запиливаем
+            if (the_map->is_point_in_obstacle(pt)) {
+                return true;
+            } 
+        }
+        */
+    //}
+    return false;
 
+/*
     if (Check::check_brick(the_map, object_1, object_2) || Check::check_slice(the_map, object_1, object_2))
         return true;
     else return false;
-
+*/
 }
 
 

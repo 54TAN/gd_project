@@ -21,7 +21,7 @@ struct RrTree {
     void extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp = NULL);
     void get_path(int index);
     void go(int index);
-    void optimize_path(Map * map, int step = 3, int iter = 2);
+    void optimize_path(Map * map, int iter = 2);
 };
 
 

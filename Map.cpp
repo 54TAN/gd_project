@@ -88,10 +88,7 @@ bool Map::is_point_in_obstacle(Coordinates point)
             return true;
         }
     }
-
     return false;
-
-
 }
 /*
 
@@ -164,7 +161,7 @@ bool Map::is_valid(Coordinates object) {
         double line[3] = {0, 1, (double) (-1 * (i))};
         double x;
         if (Geometry::get_intersection(line, equation, &x)) {
-            Coordinates pt((double)i, x); // запиливаем
+            Coordinates pt(x, i); // запиливаем
             if (is_point_in_obstacle(pt)) {
                 return true;
             }

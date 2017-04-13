@@ -24,7 +24,7 @@ void bresenham(bool **temp_plane, Coordinates point_1, Coordinates point_2,
     int fin_x = point_2.x;
     int fin_y = point_2.y; // финальные координаты
     if (bmp != NULL) bmp->add_pix(x, y, 1, edge_path);
-    else temp_plane[x][y] = true;
+    //else //temp_plane[x][y] = true;
     bool op = true; // чтобы менять х и у при заполнении пикселями
 
     sign_b *= -1;
@@ -53,8 +53,14 @@ void bresenham(bool **temp_plane, Coordinates point_1, Coordinates point_2,
                 else coords->push_back(Coordinates(y, x));
             }
         } else {
-            std::cout << y << " ";
-            std::cout << x << std::endl;
+            //std::cout << y << " ";
+            //std::cout << x << std::endl;
+            if (coords != NULL) {
+                //std::cout << "in\n";
+                if (op) coords->push_back(Coordinates(x, y));
+                else coords->push_back(Coordinates(y, x));
+                continue;
+            }
             if (op) temp_plane[x][y] = true;
             else temp_plane[y][x] = true;
         }
