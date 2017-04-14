@@ -41,7 +41,7 @@ int main(int argc, char ** argv)
 
     make_map();
 
-    RrTree rrt(&map, 1000);
+    RrTree rrt(&map, 100);
     //std::cout << rrt.is_available(&map, rrt.nodes.back().point, rrt.goal_state.point);
 
     rrt.search(&map, 1, &bmp);
