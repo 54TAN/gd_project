@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-void Geometry::get_equation(double * coefs, Coordinates one, Coordinates two) 
+void Geometry::get_equation(double* coefs, Coordinates one, Coordinates two) 
 {
     coefs[0] = two.y - one.y;
     if (coefs[0] == 0) {
@@ -20,7 +20,7 @@ void Geometry::get_equation(double * coefs, Coordinates one, Coordinates two)
     coefs[1] *= -1;
 }
 
-bool Geometry::get_intersection(double * firstLineCoefs, double * secondLineCoefs, double * x) 
+bool Geometry::get_intersection(double* firstLineCoefs, double* secondLineCoefs, double* x) 
 {
     double det = firstLineCoefs[0] * secondLineCoefs[1] - firstLineCoefs[1] * secondLineCoefs[0];
     double det_1 = (-1)*firstLineCoefs[2] * secondLineCoefs[1] - firstLineCoefs[1] * (-1)*secondLineCoefs[2];
@@ -32,7 +32,7 @@ bool Geometry::get_intersection(double * firstLineCoefs, double * secondLineCoef
     } else {
 
         if (!det_1 && !det_2) {
-            *x = -1*secondLineCoefs[2];
+            *x = -1;
             return true;
         } else {
             return false;
@@ -41,7 +41,8 @@ bool Geometry::get_intersection(double * firstLineCoefs, double * secondLineCoef
     }
 }
 
-void Geometry::up_right_left(int &first, int &second, int intersections, int i, int end_left_y, int end_right_y, bool right) {
+void Geometry::up_right_left(int& first, int& second, int intersections, int i, int end_left_y, int end_right_y, bool right) 
+{
     if (intersections == 3) {
         if (i < std::min(end_left_y, end_right_y)) {
             first   = (right) ? 0 : 1;
@@ -56,8 +57,8 @@ void Geometry::up_right_left(int &first, int &second, int intersections, int i, 
     }
 }
 
-bool Geometry::get_intersection_circle(double * coords, Coordinates circle, std::pair <Coordinates *, Coordinates *> pair) {
-
+bool Geometry::get_intersection_circle(double* coords, Coordinates circle, std::pair<Coordinates*, Coordinates*> pair) 
+{
     double k = coords[0] / (-1*coords[1]);
     double b = coords[2] / (-1*coords[1]);
 

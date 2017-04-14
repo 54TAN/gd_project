@@ -1,4 +1,5 @@
 #include "Check.h"
+#include "Render.h"
 #include "Consts.h"
 #include "Geometry.h"
 
@@ -399,4 +400,17 @@ bool Check::check_slice(Map *the_map, Coordinates object_1, Coordinates object_2
 
     return false;
 	
+}
+
+bool Check::check_line(Map* map, Coordinates object_1, Coordinates object_2) 
+{
+    bool ** some;
+    std::vector<Coordinates> coords_for_check;
+    bresenham(some, object_1, object_2, 0, 0, 0, 0, &coords_for_check);
+    for (auto item : coords_for_check) {
+        if (map->is_point_in_obstacle(item)) {
+            return true;
+        }
+    }
+    return false;
 }

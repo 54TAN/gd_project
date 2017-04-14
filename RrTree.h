@@ -19,7 +19,7 @@ struct RrTree {
     bool is_available(Map* the_map, Coordinates object_1, Coordinates object_2);
     inline double get_distance(Coordinates point_1, Coordinates point_2);
     void extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp = NULL);
-    void get_path(int index);
+    void get_path(int index, double phi = 0);
     void go(int index);
     void optimize_path(Map * map, int iter = 2);
 };

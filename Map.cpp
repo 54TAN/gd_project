@@ -136,7 +136,8 @@ bool Map::obstacle_intersection(Obstacle new_one) {
 */
 
 
-bool Map::among_points(Coordinates point) {
+bool Map::among_points(Coordinates point) 
+{
     for (size_t i = 0; i < points.size(); i++) {
         if (points[i].coords == point.coords) { return true; }
     }
@@ -144,8 +145,8 @@ bool Map::among_points(Coordinates point) {
     return false;
 }
 
-bool Map::is_valid(Coordinates object) {
-
+bool Map::is_valid(Coordinates object) 
+{
     int end_x = object.x + object.length * cos(object.phi * M_PI / 180);
     int end_y = object.y + object.length * sin(object.phi * M_PI / 180);
 
@@ -154,19 +155,15 @@ bool Map::is_valid(Coordinates object) {
     }
 
     Coordinates end(end_x, end_y);
-    double * equation = new double[3];
-    Geometry::get_equation(equation, object, end);
 
-    for (int i = std::min(end_y, (int)object.y); i < std::max(end_y, (int)object.y); i++) {
-        double line[3] = {0, 1, (double) (-1 * (i))};
-        double x;
-        if (Geometry::get_intersection(line, equation, &x)) {
-            Coordinates pt(x, i); // запиливаем
-            if (is_point_in_obstacle(pt)) {
-                return true;
-            }
+    bool ** some;
+    std::vector<Coordinates> coords_for_check;
+    bresenham(some, object, end, 0, 0, 0, 0, &coords_for_check);
+    
+    for (auto item : coords_for_check) {
+        if (is_point_in_obstacle(item)) {
+            return true;
         }
     }
-
     return false;
 }

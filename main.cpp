@@ -11,7 +11,6 @@
 #include <vector>
 
 //TODO:
-//ррт по этапам
 //ориентировать палку
 
 static std::vector <Coordinates> go_path;
@@ -29,7 +28,7 @@ void make_map()
     map.obstacles.push_back(Obstacle(Coordinates(695, 200), Coordinates(705, 600)));
 
     map.points.push_back(Coordinates(2, 2, 90, 60));
-    map.points.push_back(Coordinates(998, 598, 180, 60));
+    map.points.push_back(Coordinates(938, 538, 90, 60));
     //map.points.emplace_back(998, 48, 180, 60);
 
     render_map(map, &bmp);
@@ -42,20 +41,21 @@ int main(int argc, char ** argv)
 
     make_map();
 
-    RrTree rrt(&map, 100);
+    RrTree rrt(&map, 1000);
     //std::cout << rrt.is_available(&map, rrt.nodes.back().point, rrt.goal_state.point);
 
     rrt.search(&map, 1, &bmp);
     rrt.get_path(rrt.nodes.size() - 1);
-    render_path(rrt.path, &bmp, 1);
-    bmp.out_bmp("final.bmp");
+    std::reverse(rrt.path.begin(), rrt.path.end());
+    //render_path(rrt.path, &bmp, 1);
+    //bmp.out_bmp("final.bmp");
     std::cout << "before " << rrt.path.size() << "\n";
     //rrt.optimize_path(&map, 3);
     std::cout << "after " << rrt.path.size() << "\n";
 	
     Coordinates Movableobject(2, 2, 90, 60);
     Coordinates Previous(Movableobject);
-/*
+
     for (auto item : rrt.path) {
         Previous = MovableObject;
 
@@ -67,6 +67,7 @@ int main(int argc, char ** argv)
 
 		int end_MovableObject_x = (MovableObject.x + MovableObject.length * cos(item.phi * M_PI / 180));
         int end_MovableObject_y = MovableObject.y + MovableObject.length * sin(item.phi * M_PI / 180);
+        std::cout << "\n" << item.phi;
 
         current_coords.push_back(MovableObject);
         current_coords.push_back(Coordinates(end_MovableObject_x, end_MovableObject_y));
@@ -76,7 +77,7 @@ int main(int argc, char ** argv)
 
         render_path(current_coords, &bmp, 0);
         if (item != rrt.path.front()) render_path(heels, &bmp, 1);
-    } */ 
+    }  
 
     bmp.out_bmp("MAP_PATH.bmp"); 
     return 0;

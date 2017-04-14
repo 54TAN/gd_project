@@ -4,11 +4,11 @@
 #include <fstream>
 #include <iomanip>
 
-Coordinates::Coordinates(double x_coord, double y_coord, double phi, double length) :
-        x(x_coord),
-        y(y_coord),
-        phi(phi),
-        length(length)
+Coordinates::Coordinates(double x_, double y_, double phi_, double length_) :
+        x(x_),
+        y(y_),
+        phi(phi_),
+        length(length_)
 {
     coords.push_back(x);
     coords.push_back(y);
@@ -40,9 +40,9 @@ void Coordinates::save(const char * filename)
     file << x << " " << y << std::endl;
 }
 
-Coordinates::Coordinates(double x, double y) :
-        x(x),
-        y(y)
+Coordinates::Coordinates(double x_, double y_) :
+        x(x_),
+        y(y_)
 {
     coords.push_back(x);
     coords.push_back(y);
@@ -50,7 +50,8 @@ Coordinates::Coordinates(double x, double y) :
     coords.push_back(0);
 }
 
-bool Coordinates::operator==(Coordinates other) {
+bool Coordinates::operator==(Coordinates other) 
+{
     return (coords == other.coords) ? true : false;
 }
 

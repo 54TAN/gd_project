@@ -3,7 +3,8 @@
 
 #include <vector>
 
-struct Coordinates {
+class Coordinates {
+public:
     double x;
     double y;
     double phi;
@@ -11,13 +12,15 @@ struct Coordinates {
 
     std::vector <double> coords;
 
-    Coordinates(double x, double y);
-    Coordinates(double x_coord, double y_coord, double phi, double length);
-    Coordinates(const Coordinates & other_vec);
-    Coordinates& operator=(const Coordinates & other_vec);
-    void save(const char * filename);
-    bool operator==(Coordinates other);
-    bool operator!=(Coordinates other);
+    Coordinates(double, double);
+    Coordinates(double, double, double, double);
+    Coordinates(const Coordinates &);
+    Coordinates& operator=(const Coordinates &);
+
+    void save(const char *);
+
+    bool operator==(Coordinates);
+    bool operator!=(Coordinates);
 };
 
 
