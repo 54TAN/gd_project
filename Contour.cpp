@@ -26,7 +26,6 @@ void render_contour(const Contour& contour, Bitmap* bmp)
                    cos(contour.left_to_up.phi * M_PI / 180);
     double end_y = contour.left_to_up.y + contour.left_to_up.length *
                    sin(contour.left_to_up.phi * M_PI / 180);
-   //`j` std::cout << end_x << " " << end_y << "\n";
     Coordinates end_left_high(end_x, end_y);
     coords.push_back(contour.left_to_up);
     coords.emplace_back(end_x, end_y);
@@ -37,20 +36,16 @@ void render_contour(const Contour& contour, Bitmap* bmp)
             cos(contour.left_to_right.phi * M_PI / 180);
     end_y = contour.left_to_right.y + contour.left_to_right.length *
             sin(contour.left_to_right.phi * M_PI / 180);
-  //      std::cout << end_x << " " << end_y << "\n";
     coords.push_back(contour.left_to_right);
     Coordinates end_right_low(end_x, end_y);
     coords.emplace_back(end_x, end_y);
     render_path(coords, bmp, 0);
- //   std::cout << "here\n";
 
     coords.clear();
     end_x = end_left_high.x + contour.left_to_right.length *
             cos(contour.left_to_right.phi * M_PI / 180);
     end_y = end_left_high.y + contour.left_to_right.length * 
             sin(contour.left_to_right.phi * M_PI / 180);
-//    std::cout << end_x << " " << end_y << "\n";
-    std::cout << end_x << " " << end_y << " " << end_left_high.x << " " << end_left_high.y << "\n";
     Coordinates end_right_high(end_x, end_y);
     coords.push_back(end_left_high);
     coords.push_back(end_right_high);

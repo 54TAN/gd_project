@@ -1,4 +1,5 @@
 #include "Map.h"
+#include "Check.h"
 #include "Render.h"
 #include "Geometry.h"
 
@@ -18,13 +19,13 @@ void Map::generate_obstacles(int num, int width, int height, double min_diag, do
 }
 */
 
-void Map::generate_points(int num, int width, int height, int len) 
+void Map::generate_points(int num, int width, int height, int len, int len1) 
 {
     for (size_t i = 0; i < num; i++)
         points.push_back(gen_Point(width, height, len, 0));
 }
 
-Coordinates Map::gen_Point(int width, int height, int len, int min_x, int min_y) 
+Coordinates Map::gen_Point(int width, int height, int len, int len1, int min_x, int min_y) 
 {
     int x_r = rand() % (width - min_x) + min_x; //left_low
     int y_r = rand() % (height - min_y) + min_y;
@@ -33,12 +34,13 @@ Coordinates Map::gen_Point(int width, int height, int len, int min_x, int min_y)
     //делается тестовый контур
     //тестится
     //std::cout << x_r << " " << y_r << "\n";
-    Coordinates test_point(x_r, y_r, phi, len);//, phi);
+    //Coordinates test_point(x_r, y_r, phi, len);//, phi);
+    Contour test_point(Coordinates(x_r, y_r), phi, len, len1);
 
     if (!is_valid(test_point)) {
         return test_point;
     } else {
-        return gen_Point(width, height, len, min_x, min_y);
+        return gen_Point(width, height, len, len1, min_x, min_y);
     }
 
 }
@@ -139,7 +141,7 @@ bool Map::obstacle_intersection(Obstacle new_one) {
 
 */
 
-
+/*
 bool Map::among_points(Coordinates point) 
 {
     for (size_t i = 0; i < points.size(); i++) {
@@ -148,9 +150,10 @@ bool Map::among_points(Coordinates point)
 
     return false;
 }
+*/
 
-bool Map::is_valid(Coordinates object) 
-{
+bool Map::is_valid(Contour object) 
+{/* palka
     int end_x = object.x + object.length * cos(object.phi * M_PI / 180);
     int end_y = object.y + object.length * sin(object.phi * M_PI / 180);
 
@@ -170,4 +173,25 @@ bool Map::is_valid(Coordinates object)
         }
     }
     return false;
+    */
+    //нужно вычислить противоположную для какой-н стороны, и проверить кирпич
+    Coordinates opposite;
+    opposite.x = object.left_to_up.x + object.left_to_up.length *
+                 cos(object.left_to_up.phi * M_PI / 180);
+    opposite.y = object.left_to_up.y + object.left_to_up.length *
+                 sin(object.left_to_up.phi * M_PI / 180);
+    opposite.phi = object.left_to_up.phi;
+    if (opposite.x >= width || opposite.x <= 0 || opposite.y <= 0 || opposite.y >= height) {
+        return true;
+    }
+
+    int end_x = opposite.x + opposite.length * cos(opposite.phi * M_PI / 180);
+    int end_y = opposite.y + opposite.length * sin(opposite.phi * M_PI / 180);
+
+    if (end_x >= width || end_x <= 0 || end_y <= 0 || end_y >= height) {
+        return true;
+    }
+
+    return Check::check_brick(this, object.left_to_up, opposite);
+
 }

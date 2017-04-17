@@ -124,7 +124,7 @@ void render_map(Map the_map, Bitmap *bmp)
     for (int i = 0; i < bmp->width; i++) {
         for (int j = 0; j < bmp->height; j++) {
             Coordinates pt((double) i, (double) j);
-            bool flag = the_map.is_point_in_obstacle(pt) || the_map.among_points(pt);
+            bool flag = the_map.is_point_in_obstacle(pt);// || the_map.among_points(pt);
             bmp->add_pix(i, j, flag, 0);
         }
     }
