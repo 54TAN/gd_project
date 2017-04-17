@@ -16,7 +16,7 @@ void bresenham(bool ** temp_plain, Coordinates point_1, Coordinates point_2, boo
 void bresenham_obj(bool ** temp_plane, Coordinates  point_1, Coordinates point_2);
 void bresenham_circle(bool ** temp_plane, Coordinates point_1, int bound_x_up, int bound_y_up,
                       int bound_x_down, int bound_y_down);
-void render_map(Map the_map, Bitmap * bmp);
+void render_map(Map, Bitmap*);
 void render_path(std::vector<Coordinates> path, Bitmap * bmp, bool edge_path, bool optimized = 0,
                  bool for_moving = false,
                  std::vector <Coordinates> * coords = NULL);

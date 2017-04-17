@@ -2,6 +2,7 @@
 #include "Map.h"
 #include "RrTree.h"
 #include "Render.h"
+#include "Contour.h"
 
 #include "GL/glut.h"
 
@@ -11,7 +12,8 @@
 #include <vector>
 
 //TODO:
-//ориентировать палку
+//сделать картинку , где будут стопы в начальном и коненчом состояних
+//сделать ррт для прямоугольника
 
 static std::vector <Coordinates> go_path;
 static std::vector <Coordinates> replicated_path;
@@ -27,8 +29,8 @@ void make_map()
     map.obstacles.push_back(Obstacle(Coordinates(295, 0), Coordinates(305, 400)));
     map.obstacles.push_back(Obstacle(Coordinates(695, 200), Coordinates(705, 600)));
 
-    map.points.push_back(Coordinates(2, 2, 90, 60));
-    map.points.push_back(Coordinates(938, 538, 90, 60));
+    //map.points.push_back(Coordinates(62, 62, 90, 60));
+    //map.points.push_back(Coordinates(938, 538, 90, 60));
     //map.points.emplace_back(998, 48, 180, 60);
 
     render_map(map, &bmp);
@@ -41,6 +43,10 @@ int main(int argc, char ** argv)
 
     make_map();
 
+    Contour start(Coordinates(150, 150), 230, 80, 100); //phi, w, h
+    render_contour(start, &bmp);
+    
+/*
     RrTree rrt(&map, 100);
     //std::cout << rrt.is_available(&map, rrt.nodes.back().point, rrt.goal_state.point);
 
@@ -78,7 +84,7 @@ int main(int argc, char ** argv)
         render_path(current_coords, &bmp, 0);
         if (item != rrt.path.front()) render_path(heels, &bmp, 1);
     }  
-
+*/
     bmp.out_bmp("MAP_PATH.bmp"); 
     return 0;
 }

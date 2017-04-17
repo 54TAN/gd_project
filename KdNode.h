@@ -4,13 +4,14 @@
 #include "Consts.h"
 #include "Coordinates.h"
 
-struct KdNode {
+class KdNode {
+public:
     std::vector <double> coords;
     int split_index;
     int left;
     int right;
 
-    KdNode(std::vector <double> * point = 0, int index = 0);
+    KdNode(std::vector <double> * = nullptr, int = 0);
 };
 
 

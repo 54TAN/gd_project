@@ -11,13 +11,14 @@ typedef int LONG; // was long, which means sizeof(2*int) on my computer
 
 #define BI_RGB 0
 
-Bitmap::Bitmap(int w, int h) {
-    width = w;
-    height = h;
-    data = new unsigned char [width*height*3];
-}
+Bitmap::Bitmap(int width_, int height_) :
+    data(new unsigned char [width_*height_*3]),
+    width(width_),
+    height(height_)
+{}
 
-void Bitmap::add_pix(int i, int j, bool color, bool edge_path, bool optimized) {
+void Bitmap::add_pix(int i, int j, bool color, bool edge_path, bool optimized) 
+{
     size_t index = (j * width + i) * 3;
 
     if (edge_path) {
@@ -63,8 +64,8 @@ typedef struct tagBITMAPINFOHEADER {
 } BITMAPINFOHEADER;
 #pragma pack(pop)
 
-void Bitmap::out_bmp(const char * fname) {
-
+void Bitmap::out_bmp(const char * fname) 
+{
     BITMAPFILEHEADER bfh;
     BITMAPINFOHEADER bih;
     BYTE Palette [1024];

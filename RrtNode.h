@@ -3,15 +3,17 @@
 
 #include <vector>
 #include "Coordinates.h"
+#include "Contour.h"
 
-struct RrtNode {
+class RrtNode {
+public:
     int parent;
     std::vector<int> children;
-    Coordinates point;
-
-    RrtNode(Coordinates generated_point, int parent = -1);
+    Contour point;
+    
+    RrtNode(Coordinates, int parent = -1);
     void output();
-    bool operator==(const RrtNode& right);
+    bool operator==(const RrtNode&);
 };
 
 

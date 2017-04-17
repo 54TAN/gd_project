@@ -1,4 +1,6 @@
 #include "Render.h"
+#include "Map.h"
+#include "Bitmap.h"
 
 #include <iostream>
 #include <cmath>
@@ -7,6 +9,53 @@
 void bresenham(bool **temp_plane, Coordinates point_1, Coordinates point_2,
                bool edge_path, Bitmap *bmp, bool optimized, bool for_moving,
                std::vector<Coordinates> *coords) {
+
+    if ((int)point_1.x == (int)point_2.x) {
+        std::cout << point_1.x << " pointttttttttttttttttttt\n";
+        int x = point_1.x;
+        for (int y = std::min(point_1.y, point_2.y); 
+                 y < std::max(point_1.y, point_2.y); y++) {
+            if (bmp != NULL) {
+                if (!for_moving) {
+                    bmp->add_pix(x, y, 1, edge_path, optimized); //додумать
+                } else {
+                    coords->push_back(Coordinates(x, y));
+                }
+            } else {
+                if (coords != NULL) {
+                    coords->push_back(Coordinates(x, y));
+                    continue;
+                }
+                temp_plane[x][y] = true;
+            }
+    
+        }
+        return;
+    }
+    
+    if ((int)point_1.y == (int)point_2.y) {
+        int y = point_1.y;
+        for (int x = std::min(point_1.x, point_2.x); 
+                 x < std::max(point_1.x, point_2.x); x++) {
+            if (bmp != NULL) {
+                if (!for_moving) {
+                    bmp->add_pix(x, y, 1, edge_path, optimized); //додумать
+                } else {
+                    coords->push_back(Coordinates(x, y));
+                }
+            } else {
+                if (coords != NULL) {
+                    coords->push_back(Coordinates(x, y));
+                    continue;
+                }
+                temp_plane[x][y] = true;
+            }
+    
+        }
+        return;
+    }
+
+
 
     int a = point_2.y - point_1.y;
     int b = point_1.x - point_2.x;
@@ -45,6 +94,8 @@ void bresenham(bool **temp_plane, Coordinates point_1, Coordinates point_2,
         y += sign_a;
 
         if (bmp != NULL) {
+            std::cout << x << " " << y << " //// " << fin_x << " " << fin_y << "\n";
+            //if (x == fin_x || fin_y == y) break;
             if (!for_moving) {
                 if (op) bmp->add_pix(x, y, 1, edge_path, optimized); //додумать
                 else bmp->add_pix(y, x, 1, edge_path, optimized); //додумать
@@ -64,11 +115,12 @@ void bresenham(bool **temp_plane, Coordinates point_1, Coordinates point_2,
             if (op) temp_plane[x][y] = true;
             else temp_plane[y][x] = true;
         }
-    } while (x != fin_x || y != fin_y);
+    } while (x != fin_x && y != fin_y);
 //    std::cout << std::endl;
 }
 
-void render_map(Map the_map, Bitmap *bmp) {
+void render_map(Map the_map, Bitmap *bmp) 
+{
     for (int i = 0; i < bmp->width; i++) {
         for (int j = 0; j < bmp->height; j++) {
             Coordinates pt((double) i, (double) j);
@@ -76,7 +128,6 @@ void render_map(Map the_map, Bitmap *bmp) {
             bmp->add_pix(i, j, flag, 0);
         }
     }
-
 }
 
 void render_path(std::vector<Coordinates> path, Bitmap *bmp, bool edge_path, bool optimized,

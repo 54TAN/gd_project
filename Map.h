@@ -2,10 +2,12 @@
 #define GD_PROJECT_MAP_H
 
 #include <vector>
+#include "Contour.h"
 #include "Coordinates.h"
 #include "Obstacle.h"
 
-struct Map {
+class Map {
+public:
     std::vector<Obstacle> obstacles;
     std::vector<Coordinates> points;
     int width;

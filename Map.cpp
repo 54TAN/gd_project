@@ -18,16 +18,20 @@ void Map::generate_obstacles(int num, int width, int height, double min_diag, do
 }
 */
 
-void Map::generate_points(int num, int width, int height, int len) {
+void Map::generate_points(int num, int width, int height, int len) 
+{
     for (size_t i = 0; i < num; i++)
         points.push_back(gen_Point(width, height, len, 0));
 }
 
-Coordinates Map::gen_Point(int width, int height, int len, int min_x, int min_y) {
-
-    int x_r = rand() % (width - min_x) + min_x;
+Coordinates Map::gen_Point(int width, int height, int len, int min_x, int min_y) 
+{
+    int x_r = rand() % (width - min_x) + min_x; //left_low
     int y_r = rand() % (height - min_y) + min_y;
     int phi = rand() % 330;
+    //вот тут вычисляется right_high
+    //делается тестовый контур
+    //тестится
     //std::cout << x_r << " " << y_r << "\n";
     Coordinates test_point(x_r, y_r, phi, len);//, phi);
 

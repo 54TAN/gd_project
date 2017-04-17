@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 #include_directories(${OpenGL_INCLUDE_DIRS})
 #link_directories(${OpenGL_LIBRARY_DIRS})
 #add_definitions(${OpenGL_DEFINITIONS})
-set(SOURCE_FILES main.cpp KdNode.cpp KdNode.h KdTree.cpp KdTree.h Map.cpp Map.h Coordinates.cpp Coordinates.h Obstacle.cpp Obstacle.h Bitmap.cpp Bitmap.h RrtNode.cpp RrtNode.h RrTree.cpp RrTree.h Render.cpp Render.h Consts.h Geometry.h Geometry.cpp Check.h Check.cpp)
+set(SOURCE_FILES main.cpp KdNode.cpp KdNode.h KdTree.cpp KdTree.h Map.cpp Map.h Coordinates.cpp Coordinates.h Obstacle.cpp Obstacle.h Bitmap.cpp Bitmap.h RrtNode.cpp RrtNode.h RrTree.cpp RrTree.h Render.cpp Render.h Consts.h Geometry.h Geometry.cpp Check.h Check.cpp Feet.h Contour.h Contour.cpp)
 
 add_executable(gd_project ${SOURCE_FILES})
 
