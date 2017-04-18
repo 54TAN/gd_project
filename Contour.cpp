@@ -18,6 +18,24 @@ Contour::Contour(Coordinates point_,
     else left_to_right.phi = 270 + phi_;
 }
 
+Contour::Contour(const Contour& other) :
+    left_to_up(other.left_to_up),
+    left_to_right(other.left_to_right)
+{}
+
+Contour& Contour::operator=(const Contour& other)
+{
+    if (this != & other) {
+        left_to_up = other.left_to_up;
+        left_to_right = other.left_to_right;
+    }
+}
+
+bool Contour::operator==(const Contour& other)
+{
+    return left_to_up == other.left_to_up && left_to_right == other.left_to_right;
+}
+
 void render_contour(const Contour& contour, Bitmap* bmp)
 {
     std::vector<Coordinates> coords;

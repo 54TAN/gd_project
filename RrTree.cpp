@@ -20,11 +20,13 @@ RrTree::RrTree(Map* the_map, double distance) :
 void RrTree::search(Map* the_map, bool search, Bitmap * bmp) 
 {
     KdTree kd;
-    kd.nodes.push_back(KdNode(&the_map->points.front().coords, 0));
-    while (is_available(the_map, nodes.back().point, goal_state.point)) {
+
+    kd.nodes.push_back(KdNode(&the_map->points.front().left_to_up.coords, 0));
+
+    while (is_available(the_map, nodes.back().point, goal_state.point, bmp)) {
         the_map->generate_points(1, the_map->width, the_map->height, 
-                                 the_map->points[0].left_to_up.length, 
-                                 the_map->points[0].left_to_right.length);
+                                 the_map->points[0].left_to_right.length, 
+                                 the_map->points[0].left_to_up.length);
         extend(the_map, &kd, search, bmp);
     }
 }
@@ -32,8 +34,8 @@ void RrTree::search(Map* the_map, bool search, Bitmap * bmp)
 static
 double get_phi(const Coordinates& one, const Coordinates& two)
 {
-    double catheter_1 = one.x - two.x;
-    double catheter_2 = one.y - two.y;
+    double catheter_1 = two.x - one.x;
+    double catheter_2 = two.y - one.y;
     double hypotenuse = sqrt(pow(catheter_1, 2) + pow(catheter_2, 2));
 
     double asin_val = asin(catheter_2/hypotenuse) * 180 / M_PI;
@@ -53,7 +55,7 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp)
         kd->seek_nearest_with_kd(0, new_point.coords, 0, best_index, best_distance);
     } else {
         for (size_t i = 0; i < nodes.size(); i++) {
-            double tmp = get_distance(new_point, nodes[i].point);
+            double tmp = get_distance(new_point, nodes[i].point.left_to_up);
             if (tmp < best_distance) {
                 best_index = i;
                 best_distance = tmp;
@@ -61,36 +63,42 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp)
         }
     }
 
-    if (!is_available(map, nodes[best_index].point, the_map->points.back())) {
+    if (!is_available(the_map, nodes[best_index].point, the_map->points.back(), bmp)) {
         nodes.push_back(RrtNode(the_map->points.back(), best_index));
-        kd->push(new_point.left_to_up, 0, -1, -1);
+        kd->push(new_point.coords, 0, -1, -1);
         nodes[best_index].children.push_back(nodes.size() - 1);
     } else {
         the_map->points.pop_back();
         return;
     }
 }
-/*
+
 void RrTree::get_path(int index, double phi) 
 {
     if (index == nodes.size() - 1) {
         path.push_back(goal_state.point);
-        double new_phi = get_phi(nodes[index].point, goal_state.point) + 180;
-        Coordinates point = nodes[index].point;
-        point.phi = new_phi;
+        double new_phi = get_phi(nodes[index].point.left_to_up, goal_state.point.left_to_up) + 180;
+        Contour point(nodes[index].point.left_to_up, new_phi, 
+                      nodes[index].point.left_to_right.length,
+                      nodes[index].point.left_to_up.length);
         path.push_back(point);
+        //path.push_back(nodes[index].point);
 
     } else {
-        Coordinates point = nodes[index].point;
-        point.phi = phi;
+        Contour point(nodes[index].point.left_to_up, phi, 
+                      nodes[index].point.left_to_right.length,
+                      nodes[index].point.left_to_up.length);
         path.push_back(point);
+        //path.push_back(nodes[index].point);
     }
     if (nodes[index].parent != -1) {
-        double new_phi = get_phi(nodes[index].point, nodes[nodes[index].parent].point);
+        double new_phi = get_phi(nodes[index].point.left_to_up, 
+                                 nodes[nodes[index].parent].point.left_to_up);
         get_path(nodes[index].parent, new_phi);
+        //get_path(nodes[index].parent, 0);
     }
 }
-*/
+
 inline
 double RrTree::get_distance(Coordinates point_1, Coordinates point_2) 
 {
@@ -140,13 +148,10 @@ void RrTree::optimize_path(Map * map, int iter)
     }
 }
 */
-bool RrTree::is_available(Map *the_map, Contour object_1, Contour object_2) 
+
+static
+Coordinates get_hypotenuse(const Contour& object_1)
 {
-    //сначала разворот первого обекта на нудный угол
-    //потом кирпич до нового узла
-    //  такой кирпич - это между left-to-right старым и новым
-    //для первого жтапа достаточно проверить пиццу для гипотенузы 
-    //+ пиццу для left-to-right + is_valid для конечно состояния поворота
     double end_x = object_1.left_to_up.x + object_1.left_to_up.length * 
                    cos(object_1.left_to_up.phi * M_PI / 180);
     double end_y = object_1.left_to_up.y + object_1.left_to_up.length *
@@ -154,43 +159,59 @@ bool RrTree::is_available(Map *the_map, Contour object_1, Contour object_2)
     end_x = end_x + object_1.left_to_right.length *
             cos(object_1.left_to_right.phi * M_PI / 180);
     end_y = end_y + object_1.left_to_right.length *
-            sin(object_1.left_to_right.phi * M_PI / 180);
+            sin(object_1.left_to_right.phi * M_PI / 180); // right
     //теперь вычислим угол и длину гипотенузы, чтобы можно было представить ее в виде
     //точки приложения, длины и угла
+    //std::cout << object_1.left_to_up.x << " " << object_1.left_to_up.y << "\n";
     Coordinates hypotenuse(object_1.left_to_up);
-    hypotenuse.phi = get_phi(object_1.left_to_up, end_right_high);
+    hypotenuse.phi = get_phi(object_1.left_to_up, Coordinates(end_x, end_y));
     hypotenuse.length = sqrt(pow(object_1.left_to_up.x - end_x, 2) + 
                              pow(object_1.left_to_up.y - end_y, 2));
+    return hypotenuse; 
+}
+
+bool RrTree::is_available(Map *the_map, Contour object_1, Contour object_2, Bitmap * bmp) 
+{
+    
+    //сначала разворот первого обекта на нудный угол
+    //потом кирпич до нового узла
+    //  такой кирпич - это между left-to-right старым и новым
+    //для первого жтапа достаточно проверить пиццу для гипотенузы 
+    //+ пиццу для left-to-right + is_valid для конечно состояния поворота
+    Coordinates hypotenuse = get_hypotenuse(object_1);
+    Coordinates second_hypotenuse;
+    Coordinates second_left_to_right;
     //теперь у нас есть сама гипотенуза, все готово для того, чтобы начать проверять секторы круга
     //для этого нужен угол, на который должен развернуться первый объект, чтобы поехать ко второму
     double new_phi = get_phi(object_1.left_to_up, object_2.left_to_up);
+    
     //теперь, прежде чем проверять пиццу, нужно проверить валидность состояния,
     //в которое приедт первый объект, развернувшись 
     { 
-        Contour temp_contour_for_brick(Coordinates(object_2.left_to_up), new_phi, 
-                                       object_1.left_to_up.length, object_1.left_to_right.length);
+        Contour temp_contour_for_brick(Coordinates(object_1.left_to_up), new_phi, 
+                                       object_1.left_to_right.length, object_1.left_to_up.length);
+        //std::cout << temp_contour_for_brick.left_to_up.x << " " << temp_contour_for_brick.left_to_up.y << "\n";
+        //std::cout << "in here\n";
+        //render_contour(temp_contour_for_brick, bmp);
+        
+        second_hypotenuse = get_hypotenuse(temp_contour_for_brick);
+        second_left_to_right = temp_contour_for_brick.left_to_right;
+        
         if (the_map->is_valid(temp_contour_for_brick)) return true; 
     }
+
     //поворот возможен, значит проверяем секторы
-    //создадим две темповые палки 
-    Coordinates temp_for_hypotenuse = hypotenuse; 
-    temp_for_hypotenuse.phi += new_phi;
-    temp_for_hypotenuse.phi %= 360;
-    Coordinates temp_for_left_to_right(object_1.left_to_right);
-    temp_for_left_to_right.phi += new_phi;
-    temp_for_left_to_right.phi %= 360;
-    if (Check::check_slice(the_map, hypotenuse, temp_for_hypotenuse) || 
-        Check::check_slice(the_map, object_1.left_to_right, temp_for_left_to_right)) return true;
+    if (Check::check_slice(the_map, hypotenuse, second_hypotenuse)) return true;
+    if (Check::check_slice(the_map, object_1.left_to_right, second_left_to_right)) return true;
     //теперь слайсы проверены, и поворот в сторону обекта_2 точно возможен
     //создадим контур обекта, который приехал в левую нижнюю точку объекта_2 
     //и чекнем его
     Contour temp_contour_for_brick(Coordinates(object_2.left_to_up), new_phi, 
-                                               object_1.left_to_up.length, object_1.left_to_right.length);
+                                   object_1.left_to_right.length, object_1.left_to_up.length);
     if (the_map->is_valid(temp_contour_for_brick)) return true;
     //оасталось проверить только путь от первого темпового объекта, до второго
     //это можно сделать, проверив кирпичи между left_to_right этих объектов
-    if (Check::check_brick(the_map, temp_for_left_to_right, temp_contour_for_brick.left_to_right)) return true;
-
+    if (Check::check_brick(the_map, second_left_to_right, temp_contour_for_brick.left_to_right)) return true;
     //ну теперь вообще все достижимо
     return false;
 }

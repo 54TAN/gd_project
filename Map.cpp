@@ -22,10 +22,10 @@ void Map::generate_obstacles(int num, int width, int height, double min_diag, do
 void Map::generate_points(int num, int width, int height, int len, int len1) 
 {
     for (size_t i = 0; i < num; i++)
-        points.push_back(gen_Point(width, height, len, 0));
+        points.push_back(gen_Point(width, height, len, len1, 0));
 }
 
-Coordinates Map::gen_Point(int width, int height, int len, int len1, int min_x, int min_y) 
+Contour Map::gen_Point(int width, int height, int len, int len1, int min_x, int min_y) 
 {
     int x_r = rand() % (width - min_x) + min_x; //left_low
     int y_r = rand() % (height - min_y) + min_y;
@@ -176,11 +176,12 @@ bool Map::is_valid(Contour object)
     */
     //нужно вычислить противоположную для какой-н стороны, и проверить кирпич
     Coordinates opposite;
-    opposite.x = object.left_to_up.x + object.left_to_up.length *
-                 cos(object.left_to_up.phi * M_PI / 180);
-    opposite.y = object.left_to_up.y + object.left_to_up.length *
-                 sin(object.left_to_up.phi * M_PI / 180);
+    opposite.x = object.left_to_right.x + object.left_to_right.length *
+                 cos(object.left_to_right.phi * M_PI / 180);
+    opposite.y = object.left_to_right.y + object.left_to_right.length *
+                 sin(object.left_to_right.phi * M_PI / 180);
     opposite.phi = object.left_to_up.phi;
+    opposite.length = object.left_to_up.length;
     if (opposite.x >= width || opposite.x <= 0 || opposite.y <= 0 || opposite.y >= height) {
         return true;
     }
@@ -192,6 +193,7 @@ bool Map::is_valid(Contour object)
         return true;
     }
 
-    return Check::check_brick(this, object.left_to_up, opposite);
+    if (Check::check_brick(this, object.left_to_up, opposite)) return true;
+    return false;
 
 }

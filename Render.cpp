@@ -11,7 +11,7 @@ void bresenham(bool **temp_plane, Coordinates point_1, Coordinates point_2,
                std::vector<Coordinates> *coords) {
 
     if ((int)point_1.x == (int)point_2.x) {
-        std::cout << point_1.x << " pointttttttttttttttttttt\n";
+        //std::cout << point_1.x << " pointttttttttttttttttttt\n";
         int x = point_1.x;
         for (int y = std::min(point_1.y, point_2.y); 
                  y < std::max(point_1.y, point_2.y); y++) {
@@ -94,7 +94,7 @@ void bresenham(bool **temp_plane, Coordinates point_1, Coordinates point_2,
         y += sign_a;
 
         if (bmp != NULL) {
-            std::cout << x << " " << y << " //// " << fin_x << " " << fin_y << "\n";
+            //std::cout << x << " " << y << " //// " << fin_x << " " << fin_y << "\n";
             //if (x == fin_x || fin_y == y) break;
             if (!for_moving) {
                 if (op) bmp->add_pix(x, y, 1, edge_path, optimized); //додумать

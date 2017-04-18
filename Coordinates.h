@@ -12,6 +12,7 @@ public:
 
     std::vector <double> coords;
 
+    Coordinates() = default;
     Coordinates(double, double);
     Coordinates(double, double, double, double);
     Coordinates(const Coordinates &);

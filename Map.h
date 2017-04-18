@@ -23,7 +23,7 @@ public:
     //bool obstacle_intersection(Obstacle new_one);
     //bool check_line(Coordinates point_1, Coordinates point_2);
 
-    Coordinates gen_Point(int width, int height, int len, int len1, int min_x = 0, int min_y = 0);
+    Contour gen_Point(int width, int height, int len, int len1, int min_x = 0, int min_y = 0);
     //Obstacle gen_rand_obstacle(int width, int height, double min_diag, double max_diag);
 };
 
