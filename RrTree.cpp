@@ -9,7 +9,7 @@
 #include "Check.h"
 
 #define _USE_MATH_DEFINES
-/*
+
 RrTree::RrTree(Map* the_map, double distance) :
         goal_state(RrtNode(the_map->points.back())),
         min_distance(distance)
@@ -22,7 +22,9 @@ void RrTree::search(Map* the_map, bool search, Bitmap * bmp)
     KdTree kd;
     kd.nodes.push_back(KdNode(&the_map->points.front().coords, 0));
     while (is_available(the_map, nodes.back().point, goal_state.point)) {
-        the_map->generate_points(1, the_map->width, the_map->height, the_map->points[0].length);
+        the_map->generate_points(1, the_map->width, the_map->height, 
+                                 the_map->points[0].left_to_up.length, 
+                                 the_map->points[0].left_to_right.length);
         extend(the_map, &kd, search, bmp);
     }
 }
@@ -44,7 +46,7 @@ double get_phi(const Coordinates& one, const Coordinates& two)
 
 void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp) 
 {
-    Coordinates new_point = the_map->points.back(); // взяли только что сгенерир точку
+    Coordinates new_point = the_map->points.back().left_to_right; // взяли только что сгенерир точку
     double best_distance = the_map->width * the_map->height;
     int best_index = -1;
     if (search) {
@@ -58,38 +60,17 @@ void RrTree::extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp)
             }
         }
     }
-    Coordinates point_from_rrt = nodes[best_index].point; // now we have two points for check them
-    double new_phi = get_phi(new_point, point_from_rrt); // угол, который направляет палку в сторону новой точки
-    *//* 
-     * сначала проверяем кусок пиццы, который нужен, чтобы развернуться к новой точке
-     * потом провепяем кирпич, который есть проезжемый путь к новой точке
-     * в случае палки - это тоже палка, просто длинная
-     *
-    */
-    //first of all lets check a pizza
-    /*Coordinates for_slice_checking = point_from_rrt;
-    for_slice_checking.phi = new_phi;
-    assert(point_from_rrt.x == for_slice_checking.x);
 
-    if (!Check::check_slice(the_map, point_from_rrt, for_slice_checking) &&//checking if slice was nice
-        !Check::check_line(the_map, point_from_rrt, new_point)) // chekin if line was nice
-    { 
-        new_point.phi = new_phi;
-        if (!the_map->is_valid(new_point)) {
-            nodes.push_back(RrtNode(new_point, best_index));
-            kd->push(new_point.coords, 0, -1, -1);
-            nodes[best_index].children.push_back(nodes.size() - 1);
-            nodes[best_index].point.phi = new_phi;
-        } else {
-            the_map->points.pop_back();
-            return;
-        }
+    if (!is_available(map, nodes[best_index].point, the_map->points.back())) {
+        nodes.push_back(RrtNode(the_map->points.back(), best_index));
+        kd->push(new_point.left_to_up, 0, -1, -1);
+        nodes[best_index].children.push_back(nodes.size() - 1);
     } else {
         the_map->points.pop_back();
         return;
     }
 }
-
+/*
 void RrTree::get_path(int index, double phi) 
 {
     if (index == nodes.size() - 1) {
@@ -109,14 +90,14 @@ void RrTree::get_path(int index, double phi)
         get_path(nodes[index].parent, new_phi);
     }
 }
-
+*/
 inline
 double RrTree::get_distance(Coordinates point_1, Coordinates point_2) 
 {
     return (point_1.x - point_2.x)*(point_1.x - point_2.x) +
            (point_1.y - point_2.y)*(point_1.y - point_2.y);
 }
-
+/*
 void RrTree::go(int index) 
 {
     edges.clear();
@@ -130,7 +111,8 @@ void RrTree::go(int index)
         }
     }
 }
-
+*/
+/*
 void RrTree::optimize_path(Map * map, int iter) 
 {
     unsigned step = 2;
@@ -157,12 +139,58 @@ void RrTree::optimize_path(Map * map, int iter)
         iter--;
     }
 }
-
-bool RrTree::is_available(Map *the_map, Coordinates object_1, Coordinates object_2) 
-{
-    if (Check::check_brick(the_map, object_1, object_2) || Check::check_slice(the_map, object_1, object_2))
-        return true;
-    else return false;
-}
-
 */
+bool RrTree::is_available(Map *the_map, Contour object_1, Contour object_2) 
+{
+    //сначала разворот первого обекта на нудный угол
+    //потом кирпич до нового узла
+    //  такой кирпич - это между left-to-right старым и новым
+    //для первого жтапа достаточно проверить пиццу для гипотенузы 
+    //+ пиццу для left-to-right + is_valid для конечно состояния поворота
+    double end_x = object_1.left_to_up.x + object_1.left_to_up.length * 
+                   cos(object_1.left_to_up.phi * M_PI / 180);
+    double end_y = object_1.left_to_up.y + object_1.left_to_up.length *
+                   sin(object_1.left_to_up.phi * M_PI / 180);
+    end_x = end_x + object_1.left_to_right.length *
+            cos(object_1.left_to_right.phi * M_PI / 180);
+    end_y = end_y + object_1.left_to_right.length *
+            sin(object_1.left_to_right.phi * M_PI / 180);
+    //теперь вычислим угол и длину гипотенузы, чтобы можно было представить ее в виде
+    //точки приложения, длины и угла
+    Coordinates hypotenuse(object_1.left_to_up);
+    hypotenuse.phi = get_phi(object_1.left_to_up, end_right_high);
+    hypotenuse.length = sqrt(pow(object_1.left_to_up.x - end_x, 2) + 
+                             pow(object_1.left_to_up.y - end_y, 2));
+    //теперь у нас есть сама гипотенуза, все готово для того, чтобы начать проверять секторы круга
+    //для этого нужен угол, на который должен развернуться первый объект, чтобы поехать ко второму
+    double new_phi = get_phi(object_1.left_to_up, object_2.left_to_up);
+    //теперь, прежде чем проверять пиццу, нужно проверить валидность состояния,
+    //в которое приедт первый объект, развернувшись 
+    { 
+        Contour temp_contour_for_brick(Coordinates(object_2.left_to_up), new_phi, 
+                                       object_1.left_to_up.length, object_1.left_to_right.length);
+        if (the_map->is_valid(temp_contour_for_brick)) return true; 
+    }
+    //поворот возможен, значит проверяем секторы
+    //создадим две темповые палки 
+    Coordinates temp_for_hypotenuse = hypotenuse; 
+    temp_for_hypotenuse.phi += new_phi;
+    temp_for_hypotenuse.phi %= 360;
+    Coordinates temp_for_left_to_right(object_1.left_to_right);
+    temp_for_left_to_right.phi += new_phi;
+    temp_for_left_to_right.phi %= 360;
+    if (Check::check_slice(the_map, hypotenuse, temp_for_hypotenuse) || 
+        Check::check_slice(the_map, object_1.left_to_right, temp_for_left_to_right)) return true;
+    //теперь слайсы проверены, и поворот в сторону обекта_2 точно возможен
+    //создадим контур обекта, который приехал в левую нижнюю точку объекта_2 
+    //и чекнем его
+    Contour temp_contour_for_brick(Coordinates(object_2.left_to_up), new_phi, 
+                                               object_1.left_to_up.length, object_1.left_to_right.length);
+    if (the_map->is_valid(temp_contour_for_brick)) return true;
+    //оасталось проверить только путь от первого темпового объекта, до второго
+    //это можно сделать, проверив кирпичи между left_to_right этих объектов
+    if (Check::check_brick(the_map, temp_for_left_to_right, temp_contour_for_brick.left_to_right)) return true;
+
+    //ну теперь вообще все достижимо
+    return false;
+}

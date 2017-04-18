@@ -1,19 +1,23 @@
 #include <iostream>
 #include "RrtNode.h"
-/*
-RrtNode::RrtNode(Coordinates generated_point, int parent) :
-        parent(parent), 
-        point(generated_point)
-{}
+
+RrtNode::RrtNode(Contour generated_point, int parent) :
+        parent(parent) 
+{
+    point.left_to_up = generated_point.left_to_up;
+    point.left_to_right = generated_point.left_to_right;
+}
 
 bool RrtNode::operator==(const RrtNode& right) 
 {
-    if (this->point.x == right.point.x && this->point.y == right.point.y) return true;
+    if (point.left_to_up == right.point.left_to_up && 
+        point.left_to_right == right.point.left_to_right) return true;
     else return false;
 }
-
+/*
 void RrtNode::output() 
 {
     std::cout << point.x << " " << point.y << '\n';
 }
 */
+

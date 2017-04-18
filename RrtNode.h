@@ -11,7 +11,7 @@ public:
     std::vector<int> children;
     Contour point;
     
-    RrtNode(Coordinates, int parent = -1);
+    RrtNode(Contour, int parent = -1);
     void output();
     bool operator==(const RrtNode&);
 };

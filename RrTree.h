@@ -5,18 +5,19 @@
 #include "RrtNode.h"
 #include "Map.h"
 #include "Bitmap.h"
+#include "Contour.h"
 
 struct RrTree {
     std::vector<RrtNode> nodes;
-    std::vector<Coordinates> path;
-    std::vector<Coordinates> edges;
+    std::vector<Contour> path;
+    std::vector<Contour> edges;
     RrtNode goal_state;
     double min_distance;
 
     RrTree(Map* the_map, double distance);
     RrTree(double distance);
     void search(Map* the_map, bool search, Bitmap * bmp = NULL); // search = 1 = kd
-    bool is_available(Map* the_map, Coordinates object_1, Coordinates object_2);
+    bool is_available(Map* the_map, Contour object_1, Contour object_2);
     inline double get_distance(Coordinates point_1, Coordinates point_2);
     void extend(Map* the_map, KdTree * kd, bool search, Bitmap * bmp = NULL);
     void get_path(int index, double phi = 0);
