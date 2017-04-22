@@ -184,7 +184,7 @@ void RrTree::optimize_path(Map * map, int iter)
         //потом в пути идут два узла с одинаковой левой пяткой
         //воспользуемся этим и перепрыгнем через один такой узел
         //повторим процедуру
-        std::cout << "in here\n";
+       // std::cout << "in here\n";
         if (path[i].left_to_right.x == path[i + 1].left_to_up.x &&
             path[i].left_to_right.y == path[i + 1].left_to_up.y) {
             final_path.push_back(path[i]);
@@ -199,7 +199,7 @@ void RrTree::optimize_path(Map * map, int iter)
             double end_y = final_path.back().left_to_up.y + final_path.back().left_to_up.length *
                            sin(final_path.back().left_to_up.phi * M_PI / 180);
             Coordinates current_end(end_x, end_y);
-            std::cout << end_x << " - " << end_y << "\n";
+            //std::cout << end_x << " - " << end_y << "\n";
             double distance = get_distance(current_end, path[i + 1].left_to_up);
             //std::cout << path[i].left_to_up.length << "\n";
             std::cout << sqrt(distance) << "\n";

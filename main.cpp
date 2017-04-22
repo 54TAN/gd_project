@@ -3,6 +3,7 @@
 #include "RrTree.h"
 #include "Render.h"
 #include "Contour.h"
+#include "Feet.h"
 
 #include "GL/glut.h"
 
@@ -44,10 +45,27 @@ int main(int argc, char ** argv)
     std::cout << "before " << rrt.path.size() << "\n";
     rrt.optimize_path(&map);
     std::cout << "after " << rrt.path.size() << "\n";
-    for (auto i = 0; i < rrt.path.size(); i++) {
+
+    Feet start(rrt.path.front(), 1);
+    render_feet(start, &bmp, 0);
+    for (auto i = 1; i < rrt.path.size() - 2; i++) {
         std::cout << i << " ";
-        render_contour(rrt.path[i], &bmp, 0);
+        Feet feet;
+        if (rrt.path[i].left_to_up.x == rrt.path[i + 1].left_to_up.x &&
+            rrt.path[i].left_to_up.y == rrt.path[i + 1].left_to_up.y) //||
+            //rrt.path[i].left_to_up.x == rrt.path[i - 1].left_to_up.x &&
+            //rrt.path[i].left_to_up.y == rrt.path[i - 1].left_to_up.y) 
+        {
+            feet = Feet(rrt.path[i], 1);
+        } else {
+            feet =  Feet(rrt.path[i], 0);
+        }
+        render_feet(feet, &bmp, 0);
+        //render_contour(rrt.path[i], &bmp, 0);
     }
+    Feet finish(rrt.path.back(), 1);
+    render_feet(finish, &bmp, 0);
+
     bmp.out_bmp("MAP_PATH.bmp"); 
     return 0;
 }
