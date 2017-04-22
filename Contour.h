@@ -15,8 +15,12 @@ public:
     Contour(const Contour &);
     Contour& operator=(const Contour &);
     bool operator==(const Contour &);
+    bool operator!=(const Contour &);
+
+
+    void redirect(double phi);
 };
 
-void render_contour(const Contour&, Bitmap*);
+void render_contour(const Contour&, Bitmap*, bool = false);
 
 #endif

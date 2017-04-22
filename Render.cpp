@@ -65,13 +65,13 @@ void bresenham(bool **temp_plane, Coordinates point_1, Coordinates point_2,
     int sign_b = (b < 0) ? -1 : 1;
 
     int f = 0;
-    int x = (int) point_1.x;
-    int y = (int) point_1.y; // текущие координаты
+    int x = (int)point_1.x;
+    int y = (int)point_1.y; // текущие координаты
     //std::cout << y << std::endl;
     int dy = a * sign_a;
     int dx = b * sign_b;
-    int fin_x = point_2.x;
-    int fin_y = point_2.y; // финальные координаты
+    int fin_x = (int)point_2.x;
+    int fin_y = (int)point_2.y; // финальные координаты
     if (bmp != NULL) bmp->add_pix(x, y, 1, edge_path);
     //else //temp_plane[x][y] = true;
     bool op = true; // чтобы менять х и у при заполнении пикселями

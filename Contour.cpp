@@ -18,6 +18,13 @@ Contour::Contour(Coordinates point_,
     else left_to_right.phi = 270 + phi_;
 }
 
+void Contour::redirect(double phi)
+{
+    left_to_up.phi = phi;
+    if (phi >= 90) left_to_right.phi = phi - 90;
+    else left_to_right.phi = 270 + phi;
+}
+
 Contour::Contour(const Contour& other) :
     left_to_up(other.left_to_up),
     left_to_right(other.left_to_right)
@@ -36,7 +43,12 @@ bool Contour::operator==(const Contour& other)
     return left_to_up == other.left_to_up && left_to_right == other.left_to_right;
 }
 
-void render_contour(const Contour& contour, Bitmap* bmp)
+bool Contour::operator!=(const Contour& other)
+{
+    return !(*this == other);
+}
+
+void render_contour(const Contour& contour, Bitmap* bmp, bool color)
 {
     std::vector<Coordinates> coords;
 
@@ -47,7 +59,7 @@ void render_contour(const Contour& contour, Bitmap* bmp)
     Coordinates end_left_high(end_x, end_y);
     coords.push_back(contour.left_to_up);
     coords.emplace_back(end_x, end_y);
-    render_path(coords, bmp, 0);
+    render_path(coords, bmp, color);
 
     coords.clear();
     end_x = contour.left_to_right.x + contour.left_to_right.length * 
@@ -57,7 +69,7 @@ void render_contour(const Contour& contour, Bitmap* bmp)
     coords.push_back(contour.left_to_right);
     Coordinates end_right_low(end_x, end_y);
     coords.emplace_back(end_x, end_y);
-    render_path(coords, bmp, 0);
+    render_path(coords, bmp, color);
 
     coords.clear();
     end_x = end_left_high.x + contour.left_to_right.length *
@@ -67,10 +79,10 @@ void render_contour(const Contour& contour, Bitmap* bmp)
     Coordinates end_right_high(end_x, end_y);
     coords.push_back(end_left_high);
     coords.push_back(end_right_high);
-    render_path(coords, bmp, 0);
+    render_path(coords, bmp, color);
 
     coords.clear();
     coords.push_back(end_right_low);
     coords.push_back(end_right_high);
-    render_path(coords, bmp, 0);
+    render_path(coords, bmp, color);
 }

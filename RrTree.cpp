@@ -2,6 +2,8 @@
 #include <cassert>
 #include <iostream>
 #include <string>
+#include <algorithm>
+#include <iterator>
 
 #include "RrTree.h"
 #include "Render.h"
@@ -77,22 +79,20 @@ void RrTree::get_path(int index, double phi)
 {
     if (index == nodes.size() - 1) {
         path.push_back(goal_state.point);
-        double new_phi = get_phi(nodes[index].point.left_to_up, goal_state.point.left_to_up) + 180;
-        Contour point(nodes[index].point.left_to_up, new_phi, 
-                      nodes[index].point.left_to_right.length,
-                      nodes[index].point.left_to_up.length);
+        double new_phi = get_phi(nodes[index].point.left_to_up, goal_state.point.left_to_up);
+        Contour point = nodes[index].point;
+        point.redirect(new_phi);
         path.push_back(point);
         //path.push_back(nodes[index].point);
 
     } else {
-        Contour point(nodes[index].point.left_to_up, phi, 
-                      nodes[index].point.left_to_right.length,
-                      nodes[index].point.left_to_up.length);
+        Contour point = nodes[index].point;
+        point.redirect(phi);
         path.push_back(point);
         //path.push_back(nodes[index].point);
     }
     if (nodes[index].parent != -1) {
-        double new_phi = get_phi(nodes[index].point.left_to_up, 
+        double new_phi = 180 + get_phi(nodes[index].point.left_to_up, 
                                  nodes[nodes[index].parent].point.left_to_up);
         get_path(nodes[index].parent, new_phi);
         //get_path(nodes[index].parent, 0);
@@ -120,20 +120,23 @@ void RrTree::go(int index)
     }
 }
 */
-/*
+
 void RrTree::optimize_path(Map * map, int iter) 
 {
     unsigned step = 2;
+    iter = 10;
+    if (path.size() != 2)
     while (iter) {
-        std::vector<Coordinates> new_path;
+        std::vector<Contour> new_path;
         new_path.push_back(path.front());
 
-        std::vector<Coordinates>::size_type index = 0;
-        std::vector<Coordinates>::size_type end = path.size() - step - 1;
+        std::vector<Contour>::size_type index = 0;
+        std::vector<Contour>::size_type end = path.size() - step - 1;
         //std::cout << "index " << index << " end " << end << "\n";
-        while (index < end) {
-            if (! is_available(map, path[index], path[index + step])){
-                if (new_path.back() != path[index]) new_path.push_back(path[index]);
+        while (index != path.size() - 1) {
+            if (index <= end && ! is_available(map, path[index], path[index + step])){
+                if(new_path.back() != path[index]) 
+                    new_path.push_back(path[index]);
                 new_path.push_back(path[index + step]);
                 index += step + 1;
             } else {
@@ -143,11 +146,87 @@ void RrTree::optimize_path(Map * map, int iter)
 
         }
         new_path.push_back(path.back());
-        if (new_path.size() > 2) path = new_path;
+        if (new_path.size() > 2) {
+            path.clear();
+            std::copy(new_path.begin(), new_path.end(), std::back_inserter(path));
+        } //path = new_path;
         iter--;
     }
+
+    std::vector<Contour> path_redirected;
+    path_redirected.push_back(map->points.front());
+    for (size_t i = 0; i < path.size() - 1; i++) {
+        Contour temp = path[i];
+        double new_phi = get_phi(path[i].left_to_up, path[i + 1].left_to_up);
+        temp.redirect(new_phi);
+        path_redirected.push_back(temp);
+        temp = path[i + 1];
+        temp.redirect(new_phi);
+        path_redirected.push_back(temp);
+    }
+    path_redirected.push_back(path.back());
+    path.clear();
+    std::copy(path_redirected.begin(), path_redirected.end(), 
+              std::back_inserter(path));
+    //теперь навставляем еще квадратов
+    std::cout << "path was optimized but not quite " << path.size() << " <- current size\n";
+    std::vector<Contour> final_path;
+    final_path.push_back(path.front());
+    bool flag = true;
+    for (std::vector<Contour>::size_type i = 1; 
+         i < path.size() - 1; i++) 
+    {
+        //вычислим конец to_up
+        //если расстояние от этого конца до начала следующего узла меньше длины to_up
+        //то пушим состояние, которое начинается с этого самого конца
+        //с такими же углами
+        //если меньше, то тоже пушим, но выставляем к-н флаг, что так делать больше нельзя
+        //потом в пути идут два узла с одинаковой левой пяткой
+        //воспользуемся этим и перепрыгнем через один такой узел
+        //повторим процедуру
+        std::cout << "in here\n";
+        if (path[i].left_to_right.x == path[i + 1].left_to_up.x &&
+            path[i].left_to_right.y == path[i + 1].left_to_up.y) {
+            final_path.push_back(path[i]);
+            flag = true;
+            continue;
+        }
+        final_path.push_back(path[i]);
+        
+        while (true) {
+            double end_x = final_path.back().left_to_up.x + final_path.back().left_to_up.length * 
+                           cos(final_path.back().left_to_up.phi * M_PI / 180);
+            double end_y = final_path.back().left_to_up.y + final_path.back().left_to_up.length *
+                           sin(final_path.back().left_to_up.phi * M_PI / 180);
+            Coordinates current_end(end_x, end_y);
+            std::cout << end_x << " - " << end_y << "\n";
+            double distance = get_distance(current_end, path[i + 1].left_to_up);
+            //std::cout << path[i].left_to_up.length << "\n";
+            std::cout << sqrt(distance) << "\n";
+            if (sqrt(distance) > path[i].left_to_up.length) {
+                final_path.emplace_back(current_end, 
+                                        path[i].left_to_up.phi,
+                                        path[i].left_to_right.length,
+                                        path[i].left_to_up.length);
+            } 
+            if (sqrt(distance) <= path[i].left_to_up.length) {
+                final_path.emplace_back(current_end, 
+                                        path[i].left_to_up.phi,
+                                        path[i].left_to_right.length,
+                                        path[i].left_to_up.length);
+                break;
+            }
+
+        }
+        
+    }
+
+    final_path.push_back(path.back());
+    path.clear();
+    std::copy(final_path.begin(), final_path.end(), 
+              std::back_inserter(path));
 }
-*/
+
 
 static
 Coordinates get_hypotenuse(const Contour& object_1)
