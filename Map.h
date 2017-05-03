@@ -19,7 +19,7 @@ public:
 
     bool is_point_in_obstacle(Coordinates point);
     bool is_valid(Contour object);
-//    bool among_points(Coordinates point);
+    //bool among_points(Coordinates point);
     //bool obstacle_intersection(Obstacle new_one);
     //bool check_line(Coordinates point_1, Coordinates point_2);
 

@@ -17,7 +17,6 @@ public:
     bool operator==(const Contour &);
     bool operator!=(const Contour &);
 
-
     void redirect(double phi);
 };
 

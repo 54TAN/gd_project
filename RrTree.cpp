@@ -4,6 +4,7 @@
 #include <string>
 #include <algorithm>
 #include <iterator>
+#include <functional>
 
 #include "RrTree.h"
 #include "Render.h"
@@ -128,12 +129,12 @@ void RrTree::optimize_path(Map * map, int iter)
     if (path.size() != 2)
     while (iter) {
         std::vector<Contour> new_path;
-        new_path.push_back(path.front());
+        new_path.push_back(std::ref(path.front()));
 
         std::vector<Contour>::size_type index = 0;
         std::vector<Contour>::size_type end = path.size() - step - 1;
         //std::cout << "index " << index << " end " << end << "\n";
-        while (index != path.size() - 1) {
+        while (index <= path.size() - 1) {
             if (index <= end && ! is_available(map, path[index], path[index + step])){
                 if(new_path.back() != path[index]) 
                     new_path.push_back(path[index]);
@@ -145,7 +146,8 @@ void RrTree::optimize_path(Map * map, int iter)
             }
 
         }
-        new_path.push_back(path.back());
+        new_path.push_back(std::ref(path.back()));
+        new_path.push_back(std::ref(path.back()));
         if (new_path.size() > 2) {
             path.clear();
             std::copy(new_path.begin(), new_path.end(), std::back_inserter(path));
@@ -154,7 +156,7 @@ void RrTree::optimize_path(Map * map, int iter)
     }
 
     std::vector<Contour> path_redirected;
-    path_redirected.push_back(map->points.front());
+    path_redirected.push_back(std::ref(map->points.front()));
     for (size_t i = 0; i < path.size() - 1; i++) {
         Contour temp = path[i];
         double new_phi = get_phi(path[i].left_to_up, path[i + 1].left_to_up);
@@ -164,15 +166,14 @@ void RrTree::optimize_path(Map * map, int iter)
         temp.redirect(new_phi);
         path_redirected.push_back(temp);
     }
-    path_redirected.push_back(path.back());
+    path_redirected.push_back(std::ref(path.back()));
     path.clear();
     std::copy(path_redirected.begin(), path_redirected.end(), 
               std::back_inserter(path));
     //теперь навставляем еще квадратов
     std::cout << "path was optimized but not quite " << path.size() << " <- current size\n";
     std::vector<Contour> final_path;
-    final_path.push_back(path.front());
-    bool flag = true;
+    final_path.push_back(std::ref(path.front()));
     for (std::vector<Contour>::size_type i = 1; 
          i < path.size() - 1; i++) 
     {
@@ -188,7 +189,6 @@ void RrTree::optimize_path(Map * map, int iter)
         if (path[i].left_to_right.x == path[i + 1].left_to_up.x &&
             path[i].left_to_right.y == path[i + 1].left_to_up.y) {
             final_path.push_back(path[i]);
-            flag = true;
             continue;
         }
         final_path.push_back(path[i]);
@@ -202,7 +202,7 @@ void RrTree::optimize_path(Map * map, int iter)
             //std::cout << end_x << " - " << end_y << "\n";
             double distance = get_distance(current_end, path[i + 1].left_to_up);
             //std::cout << path[i].left_to_up.length << "\n";
-            std::cout << sqrt(distance) << "\n";
+            //std::cout << sqrt(distance) << "\n";
             if (sqrt(distance) > path[i].left_to_up.length) {
                 final_path.emplace_back(current_end, 
                                         path[i].left_to_up.phi,
@@ -221,7 +221,7 @@ void RrTree::optimize_path(Map * map, int iter)
         
     }
 
-    final_path.push_back(path.back());
+    final_path.push_back(std::ref(path.back()));
     path.clear();
     std::copy(final_path.begin(), final_path.end(), 
               std::back_inserter(path));
