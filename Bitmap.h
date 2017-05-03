@@ -10,7 +10,7 @@ public:
     
     Bitmap() = default;
     Bitmap(int, int);
-    void add_pix(int, int, bool, bool, bool optimized = 0);
+    void add_pix(int, int, bool);
     void out_bmp(const char * );
 };
 

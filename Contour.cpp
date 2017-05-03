@@ -59,7 +59,7 @@ void render_contour(const Contour& contour, Bitmap* bmp, bool color)
     Coordinates end_left_high(end_x, end_y);
     coords.push_back(contour.left_to_up);
     coords.emplace_back(end_x, end_y);
-    render_path(coords, bmp, color);
+    render_path(coords, bmp);
 
     coords.clear();
     end_x = contour.left_to_right.x + contour.left_to_right.length * 
@@ -69,7 +69,7 @@ void render_contour(const Contour& contour, Bitmap* bmp, bool color)
     coords.push_back(contour.left_to_right);
     Coordinates end_right_low(end_x, end_y);
     coords.emplace_back(end_x, end_y);
-    render_path(coords, bmp, color);
+    render_path(coords, bmp);
 
     coords.clear();
     end_x = end_left_high.x + contour.left_to_right.length *
@@ -79,10 +79,10 @@ void render_contour(const Contour& contour, Bitmap* bmp, bool color)
     Coordinates end_right_high(end_x, end_y);
     coords.push_back(end_left_high);
     coords.push_back(end_right_high);
-    render_path(coords, bmp, color);
+    render_path(coords, bmp);
 
     coords.clear();
     coords.push_back(end_right_low);
     coords.push_back(end_right_high);
-    render_path(coords, bmp, color);
+    render_path(coords, bmp);
 }

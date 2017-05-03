@@ -33,27 +33,21 @@ int main(int argc, char ** argv)
     srand(time(NULL));
 
     make_map();
-    /*render_contour(map.points.back(), &bmp, 0);
-    bmp.out_bmp("MAP_PATH.bmp");
-    return 0;*/
+
     RrTree rrt(&map, 1000);
     rrt.search(&map, 1, &bmp);
-    std::cout << rrt.nodes.size() << "\n";
     rrt.get_path(rrt.nodes.size() - 1);
     std::reverse(rrt.path.begin(), rrt.path.end());
-    std::cout << "before " << rrt.path.size() << "\n";
+    std::cout << "the path has gotten\n";
     rrt.optimize_path(&map);
-    std::cout << "after " << rrt.path.size() << "\n";
+    std::cout << "the path has optimized\n";
 
     Feet start(rrt.path.front(), 1);
     render_feet(start, &bmp, 0);
     for (auto i = 1; i < rrt.path.size() - 2; i++) {
-        std::cout << i << " ";
         Feet feet;
         if (rrt.path[i].left_to_up.x == rrt.path[i + 1].left_to_up.x &&
-            rrt.path[i].left_to_up.y == rrt.path[i + 1].left_to_up.y) //||
-            //rrt.path[i].left_to_up.x == rrt.path[i - 1].left_to_up.x &&
-            //rrt.path[i].left_to_up.y == rrt.path[i - 1].left_to_up.y) 
+            rrt.path[i].left_to_up.y == rrt.path[i + 1].left_to_up.y)
         {
             feet = Feet(rrt.path[i], 1);
         } else {

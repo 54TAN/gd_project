@@ -17,25 +17,14 @@ Bitmap::Bitmap(int width_, int height_) :
     height(height_)
 {}
 
-void Bitmap::add_pix(int i, int j, bool color, bool edge_path, bool optimized) 
+void Bitmap::add_pix(int i, int j, bool color)
 {
     size_t index = (j * width + i) * 3;
 
-    if (edge_path) {
-        if (optimized) {
-            data[index] = (unsigned char) (0);
-            data[index + 1] = (unsigned char) (255);
-            data[index + 2] = (unsigned char) (0);
-            return;
-        }
-        data[index] = (unsigned char) (0);
-        data[index + 1] = (unsigned char) (0);
-        data[index + 2] = (unsigned char) (255);
-    } else {
-        for (size_t k = 0; k < 3; k++) {
-            data[index + k] = (unsigned char) ((color) ? 0 : 255);
-        }
+    for (size_t k = 0; k < 3; k++) {
+        data[index + k] = (unsigned char) ((color) ? 0 : 255);
     }
+
 }
 
 #pragma pack(push,1)
