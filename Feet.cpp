@@ -12,7 +12,6 @@ Feet::Feet(const Contour &border, bool special)
     } else {
         for_left_heel_x = border.left_to_up.length / 2 * cos(border.left_to_up.phi * M_PI / 180);
         for_left_heel_y = border.left_to_up.length / 2 * sin(border.left_to_up.phi * M_PI / 180);
- 
     }
     double end_x = border.left_to_up.x + for_left_heel_x;
     double end_y = border.left_to_up.y + for_left_heel_y;
@@ -32,4 +31,10 @@ void render_feet(const Feet &feet, Bitmap *bmp, bool color)
 {
     render_contour(feet.left, bmp, false);
     render_contour(feet.right, bmp, false);
+}
+
+std::ostream& operator<<(std::ostream & os, Feet feet)
+{
+    os << feet.left << feet.right;
+    return os;
 }

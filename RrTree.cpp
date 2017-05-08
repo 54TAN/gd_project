@@ -106,21 +106,20 @@ double RrTree::get_distance(Coordinates point_1, Coordinates point_2)
     return (point_1.x - point_2.x)*(point_1.x - point_2.x) +
            (point_1.y - point_2.y)*(point_1.y - point_2.y);
 }
-/*
+
 void RrTree::go(int index) 
 {
     edges.clear();
     
-    Coordinates temp = nodes[index].point;
+    Coordinates temp = nodes[index].point.left_to_right;
 
     if (nodes[index].children.size() != 0) {
         for (size_t i = 0; i < nodes[index].children.size(); i++) {
             this->edges.push_back(temp);
-            this->edges.push_back(nodes[nodes[index].children[i]].point);
+            this->edges.push_back(nodes[nodes[index].children[i]].point.left_to_right);
         }
     }
 }
-*/
 
 void RrTree::optimize_path(Map * map, int iter) 
 {
@@ -129,9 +128,8 @@ void RrTree::optimize_path(Map * map, int iter)
     if (path.size() != 2)
     while (iter) {
         std::vector<Contour> new_path;
-        new_path.push_back(std::ref(path.front()));
-
-        std::vector<Contour>::size_type index = 0;
+        new_path.push_back(path[0]);
+        std::vector<Contour>::size_type index = 1;
         std::vector<Contour>::size_type end = path.size() - step - 1;
         //std::cout << "index " << index << " end " << end << "\n";
         while (index <= path.size() - 1) {
@@ -146,20 +144,27 @@ void RrTree::optimize_path(Map * map, int iter)
             }
 
         }
-        new_path.push_back(std::ref(path.back()));
-        new_path.push_back(std::ref(path.back()));
+        //new_path.push_back(path[path.size() - 1]);
         if (new_path.size() > 2) {
             path.clear();
+            //std::cout << path.size() << " ";
             std::copy(new_path.begin(), new_path.end(), std::back_inserter(path));
+            new_path.clear();
+            //std::cout << path.size() << "\n";
         } //path = new_path;
         iter--;
     }
+    std::cout << "one\n";
+    for (auto item : path) std::cout << item.left_to_up.phi << " ";
+    std::cout << "\n";
 
     std::vector<Contour> path_redirected;
     path_redirected.push_back(std::ref(map->points.front()));
     for (size_t i = 0; i < path.size() - 1; i++) {
         Contour temp = path[i];
+        //std::cout << "path[i].phi = " << path[i].left_to_up.phi << "; ";
         double new_phi = get_phi(path[i].left_to_up, path[i + 1].left_to_up);
+        std::cout << "new_phi = " << new_phi << "\n";
         temp.redirect(new_phi);
         path_redirected.push_back(temp);
         temp = path[i + 1];
@@ -170,6 +175,11 @@ void RrTree::optimize_path(Map * map, int iter)
     path.clear();
     std::copy(path_redirected.begin(), path_redirected.end(), 
               std::back_inserter(path));
+
+    std::cout << "two\n\t";
+    for (auto item : path) std::cout << item.left_to_up.phi << "\n\t";
+    std::cout << "\n";
+
     //теперь навставляем еще квадратов
     std::cout << "path was optimized but not quite " << path.size() << " <- current size\n";
     std::vector<Contour> final_path;
@@ -203,7 +213,7 @@ void RrTree::optimize_path(Map * map, int iter)
             double distance = get_distance(current_end, path[i + 1].left_to_up);
             //std::cout << path[i].left_to_up.length << "\n";
             //std::cout << sqrt(distance) << "\n";
-            if (sqrt(distance) > path[i].left_to_up.length) {
+            if (sqrt(abs(distance)) > path[i].left_to_up.length) {
                 final_path.emplace_back(current_end, 
                                         path[i].left_to_up.phi,
                                         path[i].left_to_right.length,
@@ -226,7 +236,6 @@ void RrTree::optimize_path(Map * map, int iter)
     std::copy(final_path.begin(), final_path.end(), 
               std::back_inserter(path));
 }
-
 
 static
 Coordinates get_hypotenuse(const Contour& object_1)
@@ -251,7 +260,6 @@ Coordinates get_hypotenuse(const Contour& object_1)
 
 bool RrTree::is_available(Map *the_map, Contour object_1, Contour object_2, Bitmap * bmp) 
 {
-    
     //сначала разворот первого обекта на нудный угол
     //потом кирпич до нового узла
     //  такой кирпич - это между left-to-right старым и новым

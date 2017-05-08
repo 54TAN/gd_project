@@ -1,6 +1,7 @@
 #ifndef FEET_H
 #define FEET_H
 
+#include <ostream>
 #include "Contour.h"
 
 class Feet {
@@ -19,5 +20,6 @@ public:
 };
 
 void render_feet(const Feet&, Bitmap*, bool = false);
+std::ostream& operator<<(std::ostream&, Feet);
 
 #endif

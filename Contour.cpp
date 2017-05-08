@@ -1,6 +1,7 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+#include <iomanip>
 
 #include "Contour.h"
 
@@ -23,6 +24,7 @@ void Contour::redirect(double phi)
     left_to_up.phi = phi;
     if (phi >= 90) left_to_right.phi = phi - 90;
     else left_to_right.phi = 270 + phi;
+    //std::cout << left_to_up.phi << "\n";
 }
 
 Contour::Contour(const Contour& other) :
@@ -86,3 +88,13 @@ void render_contour(const Contour& contour, Bitmap* bmp, bool color)
     coords.push_back(end_right_high);
     render_path(coords, bmp);
 }
+
+std::ostream& operator<<(std::ostream & os, Contour contour)
+{
+    os << std::setprecision(3) << contour.left_to_up.x << " " << contour.left_to_up.y << " " << contour.left_to_up.phi << "\n";
+    return os;
+}
+
+
+
+

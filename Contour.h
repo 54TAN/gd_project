@@ -3,6 +3,8 @@
 
 #include "Coordinates.h"
 #include "Bitmap.h"
+
+#include <ostream>
 //#include "Render.h"
 
 class Contour {
@@ -21,5 +23,6 @@ public:
 };
 
 void render_contour(const Contour&, Bitmap*, bool = false);
+std::ostream& operator<<(std::ostream&, Contour);
 
 #endif

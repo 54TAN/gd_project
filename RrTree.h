@@ -10,7 +10,7 @@
 struct RrTree {
     std::vector<RrtNode> nodes;
     std::vector<Contour> path;
-    std::vector<Contour> edges;
+    std::vector<Coordinates> edges;
     RrtNode goal_state;
     double min_distance;
 
