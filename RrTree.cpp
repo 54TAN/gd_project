@@ -154,9 +154,9 @@ void RrTree::optimize_path(Map * map, int iter)
         } //path = new_path;
         iter--;
     }
-    std::cout << "one\n";
-    for (auto item : path) std::cout << item.left_to_up.phi << " ";
-    std::cout << "\n";
+    //std::cout << "one\n";
+    //for (auto item : path) std::cout << item.left_to_up.phi << " ";
+    //std::cout << "\n";
 
     std::vector<Contour> path_redirected;
     path_redirected.push_back(std::ref(map->points.front()));
@@ -164,7 +164,7 @@ void RrTree::optimize_path(Map * map, int iter)
         Contour temp = path[i];
         //std::cout << "path[i].phi = " << path[i].left_to_up.phi << "; ";
         double new_phi = get_phi(path[i].left_to_up, path[i + 1].left_to_up);
-        std::cout << "new_phi = " << new_phi << "\n";
+        //std::cout << "new_phi = " << new_phi << "\n";
         temp.redirect(new_phi);
         path_redirected.push_back(temp);
         temp = path[i + 1];
@@ -176,12 +176,12 @@ void RrTree::optimize_path(Map * map, int iter)
     std::copy(path_redirected.begin(), path_redirected.end(), 
               std::back_inserter(path));
 
-    std::cout << "two\n\t";
-    for (auto item : path) std::cout << item.left_to_up.phi << "\n\t";
-    std::cout << "\n";
+    //std::cout << "two\n\t";
+    //for (auto item : path) std::cout << item.left_to_up.phi << "\n\t";
+    //std::cout << "\n";
 
     //теперь навставляем еще квадратов
-    std::cout << "path was optimized but not quite " << path.size() << " <- current size\n";
+    //std::cout << "path was optimized but not quite " << path.size() << " <- current size\n";
     std::vector<Contour> final_path;
     final_path.push_back(std::ref(path.front()));
     for (std::vector<Contour>::size_type i = 1; 

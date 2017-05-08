@@ -21,7 +21,8 @@ void make_map()
     map.obstacles.push_back(Obstacle(Coordinates(695, 200), Coordinates(705, 600)));
 
     map.points.emplace_back(Coordinates(80, 80), 90, 80, 100);
-    map.points.emplace_back(Coordinates(870, 450), 90, 80, 100);
+    map.points.emplace_back(Coordinates(90, 450), 90, 80, 100);
+    //map.points.emplace_back(Coordinates(870, 450), 90, 80, 100);
 
     //obstacles for pont only
     /*map.obstacles.push_back(Obstacle(Coordinates(0, 240), Coordinates(160, 250)));
@@ -75,3 +76,40 @@ int main(int argc, char ** argv)
     bmp.out_bmp("MAP_PATH.bmp"); 
     return 0;
 }
+
+/*
+имена некоторых переменных поясняются с учетом вчерашнего рисунка
+буду пояснять некоторые действия, на тот случай, если я где-то описался или обсчитался
+
+// ВАЖНОЕ ЗАМЕЧАНИЕ
+// в файлике feet.config каждая строчка - координата левого ниженего каждодй стопы
+// первая строчка - левая, вторая - правая, потом пустая строка, потом следующая пара
+// x1, y1, z1 - координаты хипджойнта
+// x, y, z - координаты точки крепления голени к стопе
+// hip_length - длина бедра
+// shin_length - длина голени
+
+double OC = sqrt(pow(x1, 2) + pow(y1, 2));
+double OD = sqrt(pow(x, 2) + pow(y, 2));
+double DC = abs(OC - OD); //теперь есть катет прямоугольного прямоугольника ADC
+double DA = z; // другой катет треугольника ADC
+double AC = sqrt(pow(DA, 2) + pow(DC, 2)); // гипотенуза ADC
+double dCa = asin(DA/DC);
+double P_div = (AC + hip_length + shin_length) / 2.0;
+double S = sqrt(P_div*(P_div - AC)*(P_div - hip_length)*(P_div - shin_length)); // герон
+double aCb = asin(2*S / (AC * shin_length));
+    double alpha = 180 - dCa - aCb; // внешний угол крепления голени к стопе
+double dAc = asin(DC / AC);
+double cAb = asin(2*S / (AC * hip_length));
+    double phi = 90 - dAc - cAb; // бедро к плоскости стоп, если нога передняя
+    double phi = 90 - cAb; // бедро к плоскости стоп, если нога задняя, вроде
+double OE = y;
+    double theta = acos(OE / OD); //бедро к ZX
+    //третий угол константный для ходьбы, кажется
+
+// ВАЖНО
+ сейчас считается путь по прямой, если хочется посмотреть на поворотах, закомментируйте 24 строку
+ и раскомментируйте 25
+
+
+*/
