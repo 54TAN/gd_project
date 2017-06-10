@@ -19,9 +19,43 @@ void Map::generate_obstacles(int num, int width, int height, double min_diag, do
 }
 */
 
+void Map::fill_control_points() 
+{
+	int step = 5;
+	for (size_t i = 0; i < obstacles.size(); i++) {
+		bool only_height = false;
+		bool only_width = false;
+		int width_of_cur_obst = obstacles[i].max_vec.x - obstacles[i].min_vec.x; 
+		int height_of_cur_obst = obstacles[i].max_vec.y - obstacles[i].min_vec.y;
+
+		if (width_of_cur_obst <= step) only_height = true;
+		if (height_of_cur_obst <= step) only_width = true;
+		
+		//add angles
+		control_points.push_back(obstacles[i].max_vec);
+		control_points.push_back(obstacles[i].min_vec);
+		control_points.emplace_back(obstacles[i].min_vec.x, obstacles[i].max_vec.y);
+		control_points.emplace_back(obstacles[i].max_vec.x, obstacles[i].min_vec.y);
+
+		if (! only_height) {
+			for (int k = obstacles[i].min_vec.x + step; k <= obstacles[i].max_vec.x; k += step){
+				control_points.emplace_back(k, obstacles[i].min_vec.y);
+				control_points.emplace_back(k, obstacles[i].max_vec.y);
+			}
+		}
+
+		if (! only_width) {
+			for (int k = obstacles[i].min_vec.y + step; k <= obstacles[i].max_vec.y; k += step) {
+				control_points.emplace_back(obstacles[i].min_vec.x, k);
+				control_points.emplace_back(obstacles[i].max_vec.x, k);
+			}
+		}
+	}	
+}
+
 void Map::generate_points(int num, int width, int height, int len, int len1) 
 {
-    for (size_t i = 0; i < num; i++)
+    for (int i = 0; i < num; i++)
         points.push_back(gen_Point(width, height, len, len1, 0));
 }
 

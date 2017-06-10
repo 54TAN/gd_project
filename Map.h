@@ -10,11 +10,14 @@ class Map {
 public:
     std::vector<Obstacle> obstacles;
     std::vector<Contour> points;
+	std::vector<Coordinates> control_points;
+
     int width;
     int height;
 
     //void generate_obstacles(int num, int width, int height, double min_diag, double max_diag);
     void generate_points(int num, int width, int height, int len, int len1);
+	void fill_control_points();
     //void save(const char * file_for_Obstacles, const char * file_for_points);
 
     bool is_point_in_obstacle(Coordinates point);

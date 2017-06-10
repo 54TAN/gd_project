@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <chrono>
 #include <iterator>
 #include <functional>
 
@@ -23,15 +24,16 @@ RrTree::RrTree(Map* the_map, double distance) :
 void RrTree::search(Map* the_map, bool search, Bitmap * bmp) 
 {
     KdTree kd;
-
     kd.nodes.push_back(KdNode(&the_map->points.front().left_to_up.coords, 0));
-
+	long long counter = 0;
     while (is_available(the_map, nodes.back().point, goal_state.point, bmp)) {
         the_map->generate_points(1, the_map->width, the_map->height, 
                                  the_map->points[0].left_to_right.length, 
                                  the_map->points[0].left_to_up.length);
+		counter++;
         extend(the_map, &kd, search, bmp);
     }
+	std::cout << "amount of generated points : " << counter << "\n";
 }
 
 static
@@ -274,31 +276,47 @@ bool RrTree::is_available(Map *the_map, Contour object_1, Contour object_2, Bitm
     
     //теперь, прежде чем проверять пиццу, нужно проверить валидность состояния,
     //в которое приедт первый объект, развернувшись 
+	//auto start_time = std::chrono::system_clock::now();
+	//auto end_time = std::chrono::system_clock::now();
     { 
         Contour temp_contour_for_brick(Coordinates(object_1.left_to_up), new_phi, 
                                        object_1.left_to_right.length, object_1.left_to_up.length);
         //std::cout << temp_contour_for_brick.left_to_up.x << " " << temp_contour_for_brick.left_to_up.y << "\n";
         //std::cout << "in here\n";
         //render_contour(temp_contour_for_brick, bmp);
-        
         second_hypotenuse = get_hypotenuse(temp_contour_for_brick);
         second_left_to_right = temp_contour_for_brick.left_to_right;
         
+       	//start_time = std::chrono::system_clock::now(); 
         if (the_map->is_valid(temp_contour_for_brick)) return true; 
+       	//end_time = std::chrono::system_clock::now(); 
     }
 
+	//auto elapsed_brick = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+
     //поворот возможен, значит проверяем секторы
-    if (Check::check_slice(the_map, hypotenuse, second_hypotenuse)) return true;
-    if (Check::check_slice(the_map, object_1.left_to_right, second_left_to_right)) return true;
+	//start_time = std::chrono::system_clock::now(); 
+	//if (check_brick()) return true;
+	//if (Check::check_slice(the_map, hypotenuse, second_hypotenuse)) return true;
+    //if (Check::check_slice(the_map, object_1.left_to_right, second_left_to_right)) return true;
+    
+    //end_time = std::chrono::system_clock::now(); 
+	//auto elapsed_slice = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+
+	//std::cout << "slice's time : " << elapsed_slice.count() << "ms \n";
     //теперь слайсы проверены, и поворот в сторону обекта_2 точно возможен
     //создадим контур обекта, который приехал в левую нижнюю точку объекта_2 
     //и чекнем его
     Contour temp_contour_for_brick(Coordinates(object_2.left_to_up), new_phi, 
                                    object_1.left_to_right.length, object_1.left_to_up.length);
+	//start_time = std::chrono::system_clock::now();
     if (the_map->is_valid(temp_contour_for_brick)) return true;
     //оасталось проверить только путь от первого темпового объекта, до второго
     //это можно сделать, проверив кирпичи между left_to_right этих объектов
     if (Check::check_brick(the_map, second_left_to_right, temp_contour_for_brick.left_to_right)) return true;
+	//end_time = std::chrono::system_clock::now();
+	//elapsed_brick += std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+	//std::cout << "brick's time : " << elapsed_brick.count() << "\n";
     //ну теперь вообще все достижимо
     return false;
 }

@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <ctime>
 #include <vector>
+#include <chrono>
 
 static Bitmap bmp(width, height);
 static Map map;
@@ -20,10 +21,16 @@ void make_map()
     map.obstacles.push_back(Obstacle(Coordinates(295, 0), Coordinates(305, 400)));
     map.obstacles.push_back(Obstacle(Coordinates(695, 200), Coordinates(705, 600)));
 
-    map.points.emplace_back(Coordinates(80, 80), 90, 80, 100);
-    map.points.emplace_back(Coordinates(90, 450), 90, 80, 100);
-    //map.points.emplace_back(Coordinates(870, 450), 90, 80, 100);
-
+    map.points.emplace_back(Coordinates(80, 80), 90, contour_width, contour_height);
+    //map.points.emplace_back(Coordinates(90, 450), 90, 80, 100);
+    map.points.emplace_back(Coordinates(870, 450), 90, contour_width, contour_height); // угол, ширина, высота
+	map.fill_control_points();
+	/*
+	std::cout << "control_points.size() = " << map.control_points.size() << "\n";
+	for (auto item : map.control_points) {
+		std::cout << item.x << " " << item.y << "\n";
+	}		
+*/
     //obstacles for pont only
     /*map.obstacles.push_back(Obstacle(Coordinates(0, 240), Coordinates(160, 250)));
     map.obstacles.push_back(Obstacle(Coordinates(840, 350), Coordinates(1000, 360)));
@@ -36,14 +43,20 @@ void make_map()
     bmp.out_bmp("MAP_PATH.bmp");
 }
 
-int main(int argc, char ** argv) 
+int main() 
 {
     srand(time(NULL));
 
     make_map();
 
-    RrTree rrt(&map, 200);
+	RrTree rrt(&map, 200);
+	auto s = std::chrono::system_clock::now();
     rrt.search(&map, 1, &bmp);
+	auto e = std::chrono::system_clock::now();
+
+	auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(e - s);
+	std::cout << "time of search: " << elapsed.count() << "ms \n";
+
     rrt.get_path(rrt.nodes.size() - 1);
     std::reverse(rrt.path.begin(), rrt.path.end());
     std::cout << "the path has gotten\n";
@@ -55,7 +68,7 @@ int main(int argc, char ** argv)
     Feet start(rrt.path.front(), 1);
     config << start << "\n";
     render_feet(start, &bmp, 0);
-    for (auto i = 1; i < rrt.path.size() - 2; i++) {
+    for (size_t i = 1; i < rrt.path.size() - 2; i++) {
         Feet feet;
         if (rrt.path[i].left_to_up.x == rrt.path[i + 1].left_to_up.x &&
             rrt.path[i].left_to_up.y == rrt.path[i + 1].left_to_up.y)
@@ -66,7 +79,22 @@ int main(int argc, char ** argv)
             feet =  Feet(rrt.path[i], 0);
             config << feet << "\n";
         }
-        render_feet(feet, &bmp, 0);
+		bool rightOrLeft = true;
+		for (int k = 0; k < 2; k++) {
+        	//render_feet(feet, &bmp, 0);
+			if (rightOrLeft) {
+				render_contour(feet.right, &bmp, 0);
+				rightOrLeft = false;
+			} else {
+				render_contour(feet.left, &bmp, 0);
+			}	
+			std::string nameOfFile = "bmp";
+			nameOfFile += std::to_string(i);
+			nameOfFile += ".";
+			nameOfFile += std::to_string(k);
+			nameOfFile += ".bmp";
+			bmp.out_bmp(nameOfFile.c_str());
+		}	
         //render_contour(rrt.path[i], &bmp, 0);
     }
     Feet finish(rrt.path.back(), 1);
@@ -74,6 +102,7 @@ int main(int argc, char ** argv)
     config << finish;
 
     bmp.out_bmp("MAP_PATH.bmp"); 
+	
     return 0;
 }
 
