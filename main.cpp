@@ -10,20 +10,20 @@
 #include <vector>
 #include <chrono>
 
-static Bitmap bmp(width, height);
+static Bitmap bmp(WIDTH, HEIGTH);
 static Map map;
 
 void make_map() 
 {
-    map.height = height;
-    map.width = width;
+    map.height = HEIGTH;
+    map.width = WIDTH;
     
     map.obstacles.push_back(Obstacle(Coordinates(295, 0), Coordinates(305, 400)));
     map.obstacles.push_back(Obstacle(Coordinates(695, 200), Coordinates(705, 600)));
 
-    map.points.emplace_back(Coordinates(80, 80), 90, contour_width, contour_height);
+    map.points.emplace_back(Coordinates(80, 80), 90, CONTOUR_WIDTH, CONTOUR_HEIGTH);
     //map.points.emplace_back(Coordinates(90, 450), 90, 80, 100);
-    map.points.emplace_back(Coordinates(870, 450), 90, contour_width, contour_height); // угол, ширина, высота
+    map.points.emplace_back(Coordinates(870, 450), 90, CONTOUR_WIDTH, CONTOUR_HEIGTH); // угол, ширина, высота
 	map.fill_control_points();
 	/*
 	std::cout << "control_points.size() = " << map.control_points.size() << "\n";

@@ -10,12 +10,12 @@
 #include <cmath>
 /*
 
-void Map::generate_obstacles(int num, int width, int height, double min_diag, double max_diag) {
+void Map::generate_obstacles(int num, int WIDTH, int HEIGTH, double min_diag, double max_diag) {
     for (int i = 0; i < num; i++) {
-        obstacles.push_back(gen_rand_obstacle(width, height, min_diag, max_diag));
+        obstacles.push_back(gen_rand_obstacle(WIDTH, HEIGTH, min_diag, max_diag));
     }
-    this->width = width;
-    this->height = height;
+    this->WIDTH = WIDTH;
+    this->HEIGTH = HEIGTH;
 }
 */
 
@@ -80,12 +80,12 @@ Contour Map::gen_Point(int width, int height, int len, int len1, int min_x, int 
 }
 /*
 
-Obstacle Map::gen_rand_obstacle(int width, int height, double min_diag, double max_diag) {
-    Coordinates new_min = gen_Point(width, height);
-    Coordinates new_max = gen_Point(width, height, new_min.x, new_min.y);
+Obstacle Map::gen_rand_obstacle(int WIDTH, int HEIGTH, double min_diag, double max_diag) {
+    Coordinates new_min = gen_Point(WIDTH, HEIGTH);
+    Coordinates new_max = gen_Point(WIDTH, HEIGTH, new_min.x, new_min.y);
 
     if ((new_max.x - new_min.x < 50) || (new_max.y - new_min.y < 50)) {
-        return gen_rand_obstacle(width, height, min_diag, max_diag);
+        return gen_rand_obstacle(WIDTH, HEIGTH, min_diag, max_diag);
     }
 
     Obstacle test_Obstacle(new_min, new_max);
@@ -95,7 +95,7 @@ Obstacle Map::gen_rand_obstacle(int width, int height, double min_diag, double m
         //std::cout << "Obstacle" << std::endl;
         return test_Obstacle;
     } else {
-        return gen_rand_obstacle(width, height, min_diag, max_diag);
+        return gen_rand_obstacle(WIDTH, HEIGTH, min_diag, max_diag);
     }
 
 }
@@ -191,7 +191,7 @@ bool Map::is_valid(Contour object)
     int end_x = object.x + object.length * cos(object.phi * M_PI / 180);
     int end_y = object.y + object.length * sin(object.phi * M_PI / 180);
 
-    if (end_x >= width || end_x <= 0 || end_y <= 0 || end_y >= height) {
+    if (end_x >= WIDTH || end_x <= 0 || end_y <= 0 || end_y >= HEIGTH) {
         return true;
     }
 

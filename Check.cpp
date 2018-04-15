@@ -20,27 +20,27 @@ bool Check::check_brick(Map *the_map, Coordinates object_1, Coordinates object_2
     Coordinates down = (object_1.y > object_2.y) ? object_2 : object_1;
 
     int end_left_x = left.x + left.length * cos(object_1.phi * M_PI / 180);
-    if (end_left_x < 0 || end_left_x >= width) return true;
+    if (end_left_x < 0 || end_left_x >= WIDTH) return true;
     int end_left_y = left.y + left.length * sin(object_1.phi * M_PI / 180);
-    if (end_left_y < 0 || end_left_y >= height) return true;
+    if (end_left_y < 0 || end_left_y >= HEIGTH) return true;
     Coordinates end_left(end_left_x, end_left_y);
 
     int end_right_x = right.x + right.length * cos(object_1.phi * M_PI / 180);
-    if (end_right_x < 0 || end_right_x >= width) return true;
+    if (end_right_x < 0 || end_right_x >= WIDTH) return true;
     int end_right_y = right.y + right.length * sin(object_1.phi * M_PI / 180);
-    if (end_right_y < 0 || end_right_y >= height) return true;
+    if (end_right_y < 0 || end_right_y >= HEIGTH) return true;
     Coordinates end_right(end_right_x, end_right_y);
 
     int end_up_x = up.x + up.length * cos(object_1.phi * M_PI / 180);
-    if (end_up_x < 0 || end_up_x >= width) return true;
+    if (end_up_x < 0 || end_up_x >= WIDTH) return true;
     int end_up_y = up.y + up.length * sin(object_1.phi * M_PI / 180);
-    if (end_up_y < 0 || end_up_y >= height) return true;
+    if (end_up_y < 0 || end_up_y >= HEIGTH) return true;
     Coordinates end_up(end_up_x, end_up_y);
 
     int end_down_x = down.x + down.length * cos(object_1.phi * M_PI / 180);
-    if (end_down_x < 0 || end_down_x >= width) return true;
+    if (end_down_x < 0 || end_down_x >= WIDTH) return true;
     int end_down_y = down.y + down.length * sin(object_1.phi * M_PI / 180);
-    if (end_down_y < 0 || end_down_y >= height) return true;
+    if (end_down_y < 0 || end_down_y >= HEIGTH) return true;
     Coordinates end_down(end_down_x, end_down_y);
 
 
@@ -117,15 +117,15 @@ bool Check::check_slice(Map *the_map, Coordinates object_1, Coordinates object_2
     Coordinates less = (object_1.phi > object_2.phi) ? object_2 : object_1;
 
     int end_less_x = object_2.x + object_2.length * cos(less.phi * M_PI / 180);
-    if (end_less_x < 0 || end_less_x >= width) return true;
+    if (end_less_x < 0 || end_less_x >= WIDTH) return true;
     int end_less_y = object_2.y + object_2.length * sin(less.phi * M_PI / 180);
-    if (end_less_y < 0 || end_less_y >= width) return true;
+    if (end_less_y < 0 || end_less_y >= WIDTH) return true;
     Coordinates end_less(end_less_x, end_less_y);
 
     int end_more_x = object_2.x + object_2.length * cos(more.phi * M_PI / 180);
-    if (end_more_x < 0 || end_more_x >= width) return true;
+    if (end_more_x < 0 || end_more_x >= WIDTH) return true;
     int end_more_y = object_2.y + object_2.length * sin(more.phi * M_PI / 180);
-    if (end_more_x < 0 || end_more_x >= width) return true;
+    if (end_more_x < 0 || end_more_x >= WIDTH) return true;
     Coordinates end_more(end_more_x, end_more_y);
 
     size_t circle_index = (more.phi < 180) ? 2 : 1;
@@ -187,10 +187,10 @@ bool Check::check_slice(Map *the_map, Coordinates object_1, Coordinates object_2
         high_bound_x = object_2.x + object_2.length;
     }
 
-    if (low_bound_x < 0 || low_bound_x >= width) return true;
-    if (high_bound_x < 0 || high_bound_x >= width) return true;
-    if (low_bound_y < 0 || low_bound_y >= height) return true;
-    if (high_bound_y < 0 || high_bound_y >= height) return true;
+    if (low_bound_x < 0 || low_bound_x >= WIDTH) return true;
+    if (high_bound_x < 0 || high_bound_x >= WIDTH) return true;
+    if (low_bound_y < 0 || low_bound_y >= HEIGTH) return true;
+    if (high_bound_y < 0 || high_bound_y >= HEIGTH) return true;
 
 
     pizza[circle_index] = std::make_pair(less, less);

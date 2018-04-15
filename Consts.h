@@ -2,9 +2,9 @@
 #define GD_PROJECT_CONSTS_H
 
 constexpr int N 				= 3;
-constexpr int width 			= 1000;
-constexpr int height 			= 600;
-constexpr int contour_width 	= 80;
-constexpr int contour_height 	= 100;
+constexpr int WIDTH 			= 1000;
+constexpr int HEIGTH 			= 600;
+constexpr int CONTOUR_WIDTH 	= 80;
+constexpr int CONTOUR_HEIGTH 	= 100;
 
 #endif //GD_PROJECT_CONSTS_H
