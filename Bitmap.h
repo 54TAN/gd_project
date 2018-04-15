@@ -4,14 +4,17 @@
 
 class Bitmap {
 public:
-    unsigned char * data;
+    unsigned char *data;
     int width;
     int height;
-    
+
     Bitmap() = default;
+
     Bitmap(int, int);
+
     void add_pix(int, int, bool);
-    void out_bmp(const char * );
+
+    void out_bmp(const char *);
 };
 
 

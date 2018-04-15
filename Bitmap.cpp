@@ -4,7 +4,7 @@
 #include <cstring>
 
 typedef unsigned DWORD; // was unsigned long
-typedef void * HANDLE;
+typedef void *HANDLE;
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef int LONG; // was long, which means sizeof(2*int) on my computer
@@ -12,10 +12,9 @@ typedef int LONG; // was long, which means sizeof(2*int) on my computer
 #define BI_RGB 0
 
 Bitmap::Bitmap(int width_, int height_) :
-    data(new unsigned char [width_*height_*3]),
-    width(width_),
-    height(height_)
-{}
+        data(new unsigned char[width_ * height_ * 3]),
+        width(width_),
+        height(height_) {}
 
 void Bitmap::add_pix(int i, int j, bool color)
 {
@@ -24,40 +23,39 @@ void Bitmap::add_pix(int i, int j, bool color)
     for (size_t k = 0; k < 3; k++) {
         data[index + k] = (unsigned char) ((color) ? 0 : 255);
     }
-
 }
 
-#pragma pack(push,1)
+#pragma pack(push, 1)
 typedef struct tagBITMAPFILEHEADER {
-    WORD  bfType;
+    WORD bfType;
     DWORD bfSize;
-    WORD  bfReserved1; //
-    WORD  bfReserved2; //
+    WORD bfReserved1; //
+    WORD bfReserved2; //
     DWORD bfOffBits;
 } BITMAPFILEHEADER;
 #pragma pack(pop)
 
-#pragma pack(push,1)
+#pragma pack(push, 1)
 typedef struct tagBITMAPINFOHEADER {
     DWORD biSize;
-    LONG  biWidth;
-    LONG  biHeight;
-    WORD  biPlanes;
-    WORD  biBitCount;
+    LONG biWidth;
+    LONG biHeight;
+    WORD biPlanes;
+    WORD biBitCount;
     DWORD biCompression;
     DWORD biSizeImage;//
-    LONG  biXPelsPerMeter; //
-    LONG  biYPelsPerMeter; //
+    LONG biXPelsPerMeter; //
+    LONG biYPelsPerMeter; //
     DWORD biClrUsed;
     DWORD biClrImportant; //
 } BITMAPINFOHEADER;
 #pragma pack(pop)
 
-void Bitmap::out_bmp(const char * fname) 
+void Bitmap::out_bmp(const char *fname)
 {
     BITMAPFILEHEADER bfh;
     BITMAPINFOHEADER bih;
-    BYTE Palette [1024];
+    BYTE Palette[1024];
 
     memset(Palette, 0, 1024);
     memset(&bfh, 0, sizeof(bfh));
@@ -76,7 +74,7 @@ void Bitmap::out_bmp(const char * fname)
     bih.biWidth = width;
     bih.biPlanes = 1;
 
-    FILE * f2 = fopen(fname, "w+b");
+    FILE *f2 = fopen(fname, "w+b");
     fwrite(&bfh, sizeof(bfh), 1, f2);
     fwrite(&bih, sizeof(bih), 1, f2);
     fwrite(&Palette, sizeof(Palette), 1, f2);
